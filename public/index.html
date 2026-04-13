@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lead Gen App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>🎯 Local Lead Finder</h1>
+      <p class="subtitle">Find, score, and message local businesses — automatically</p>
+    </header>
+
+    <!-- Search Form -->
+    <form id="search-form">
+      <div class="form-group">
+        <input type="text" id="niche" placeholder="Niche (e.g. barbershop, dentist)" required />
+        <input type="text" id="city" placeholder="City (e.g. Austin, TX)" required />
+        <button type="submit" id="search-btn">Search</button>
+      </div>
+    </form>
+
+    <div id="status"></div>
+
+    <!-- Tabs -->
+    <div id="tabs-wrapper" class="hidden">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="results">📋 Results</button>
+        <button class="tab-btn" data-tab="outreach">✉️ Outreach</button>
+        <button class="tab-btn" data-tab="history">🕓 History</button>
+      </div>
+
+      <!-- Tab: Results -->
+      <div id="tab-results" class="tab-content active">
+        <div class="tab-header">
+          <span id="results-title"></span>
+          <button id="export-btn">⬇️ Export CSV</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Business Name</th>
+                <th>Phone</th>
+                <th>Website</th>
+                <th>Rating</th>
+                <th>Reviews</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Outreach -->
+      <div id="tab-outreach" class="tab-content">
+        <p class="tab-hint">Click a message to copy it to your clipboard.</p>
+        <div id="outreach-list"></div>
+      </div>
+
+      <!-- Tab: History -->
+      <div id="tab-history" class="tab-content">
+        <div id="history-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

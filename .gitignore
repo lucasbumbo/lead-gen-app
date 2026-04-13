@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment variables (never commit your real secrets)
+.env
+
+# Generated data (ephemeral on cloud — recreated at runtime)
+data/exports/*
+!data/exports/.gitkeep
+data/history.json
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
