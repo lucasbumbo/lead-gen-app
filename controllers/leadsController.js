@@ -1,16 +1,17 @@
 /**
  * leadsController.js
  * Orchestrates the full lead generation pipeline:
- * Fetch → Clean → Score → Outreach → Export → Save History
+ * Fetch (Google + Foursquare) → Clean → Score → Outreach → Export → Save History
  */
 
 const { searchBusinesses }    = require('../services/placesService');
+const { searchFoursquare }    = require('../services/foursquareService');
 const { cleanLeads }          = require('../services/cleaningService');
 const { scoreLeads }          = require('../services/scoringService');
 const { addOutreachMessages } = require('../services/outreachService');
 const { exportToCSV, getExportPath } = require('../services/exportService');
 const { saveSearch, readHistory }    = require('../services/historyService');
-const fs   = require('fs');
+const fs = require('fs');
 
 /**
  * POST /api/leads
@@ -25,8 +26,13 @@ async function getLeads(req, res) {
   }
 
   try {
-    // 1. Fetch raw leads (includes Instagram scraping)
-    const raw = await searchBusinesses(niche.trim(), city.trim(), { brazilTab });
+    // 1. Fetch from Google Places + Foursquare in parallel
+    const [googleRaw, foursquareRaw] = await Promise.all([
+      searchBusinesses(niche.trim(), city.trim(), { brazilTab }),
+      searchFoursquare(niche.trim(), city.trim(), { brazilTab }),
+    ]);
+
+    const raw = [...googleRaw, ...foursquareRaw];
 
     // 2. Normalize phone/website, remove duplicates
     const cleaned = cleanLeads(raw);

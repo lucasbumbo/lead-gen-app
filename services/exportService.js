@@ -50,6 +50,7 @@ function leadsToCSV(leads) {
     'Score',
     'Score Label',
     'Outreach Message',
+    'Source',
   ];
 
   const rows = leads.map((lead) => [

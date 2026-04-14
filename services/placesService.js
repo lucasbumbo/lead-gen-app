@@ -134,6 +134,7 @@ async function searchBusinesses(niche, city, options = {}) {
         reviewCount: place.user_ratings_total || null,
         address:     place.formatted_address || null,
         brazilTab,
+        source:      'Google',
       };
     })
   );
