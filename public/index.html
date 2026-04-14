@@ -3,91 +3,113 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🎬 VideoLead Finder</title>
+  <title>LenzLead — Local Lead Generation</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <div class="container">
-    <header>
-      <h1>🎬 VideoLead Finder</h1>
-      <p class="subtitle">Find local businesses that need your video services — in the USA and Brazilian communities</p>
-    </header>
+  <!-- ── Top nav bar ── -->
+  <nav class="navbar">
+    <img src="logo.png" alt="LenzLead" class="nav-logo" />
+    <span class="nav-badge">Beta</span>
+  </nav>
 
-    <!-- Market selector -->
+  <div class="container">
+
+    <!-- ── Hero ── -->
+    <div class="hero">
+      <h1 class="hero-title">Find your next <span class="accent">video client</span></h1>
+      <p class="hero-sub">Search local businesses by niche and city — scored, ranked, and ready to contact.</p>
+    </div>
+
+    <!-- ── Market tabs ── -->
     <div class="market-tabs">
       <button class="market-tab active" data-market="us">🇺🇸 US Market</button>
       <button class="market-tab" data-market="brazil">🇧🇷 Brazilian Community</button>
     </div>
 
-    <!-- US Market Form -->
-    <form id="form-us" class="search-form active-form">
+    <!-- ── US Form ── -->
+    <form id="form-us" class="search-card">
       <div class="form-group">
-        <input type="text" id="us-niche" placeholder="Niche (e.g. barbershop, dentist, gym)" required />
-        <input type="text" id="us-city"  placeholder="City (e.g. Miami, FL)" required />
-        <button type="submit" class="btn-search">Search 🔍</button>
+        <div class="input-wrap">
+          <span class="input-icon">🎯</span>
+          <input type="text" id="us-niche" placeholder="Niche — e.g. barbershop, dentist, gym" required />
+        </div>
+        <div class="input-wrap">
+          <span class="input-icon">📍</span>
+          <input type="text" id="us-city" placeholder="City — e.g. Miami, FL" required />
+        </div>
+        <button type="submit" class="btn-search">Search <span class="btn-arrow">→</span></button>
       </div>
     </form>
 
-    <!-- Brazilian Community Form -->
-    <form id="form-brazil" class="search-form" style="display:none">
+    <!-- ── Brazil Form ── -->
+    <form id="form-brazil" class="search-card" style="display:none">
       <div class="form-group">
-        <input type="text" id="br-niche"
-          placeholder="Nicho (ex: restaurante brasileiro)"
-          list="br-niche-list" required />
-        <datalist id="br-niche-list">
-          <option value="restaurante brasileiro">
-          <option value="salão de beleza">
-          <option value="barbearia brasileira">
-          <option value="limpeza residencial">
-          <option value="construção e reforma">
-          <option value="paisagismo">
-          <option value="padaria brasileira">
-          <option value="açougue brasileiro">
-          <option value="mercado brasileiro">
-          <option value="academia brasileira">
-          <option value="igreja evangélica">
-          <option value="escola de português">
-          <option value="buffet brasileiro">
-          <option value="advogado brasileiro">
-          <option value="clínica brasileira">
-        </datalist>
-        <select id="br-city" required>
-          <option value="">Selecione a cidade…</option>
-          <optgroup label="🗺️ New England (comunidade brasileira)">
-            <option value="Framingham, MA">Framingham, MA — 🇧🇷 Pequeno Brasil</option>
-            <option value="Marlborough, MA">Marlborough, MA</option>
-            <option value="Hudson, MA">Hudson, MA</option>
-            <option value="Somerville, MA">Somerville, MA</option>
-            <option value="Everett, MA">Everett, MA</option>
-            <option value="Malden, MA">Malden, MA</option>
-            <option value="Fall River, MA">Fall River, MA</option>
-            <option value="Boston, MA">Boston, MA</option>
-            <option value="Providence, RI">Providence, RI</option>
-          </optgroup>
-          <optgroup label="🌎 Outros estados">
-            <option value="Miami, FL">Miami, FL</option>
-            <option value="Orlando, FL">Orlando, FL</option>
-            <option value="Newark, NJ">Newark, NJ</option>
-            <option value="Pompano Beach, FL">Pompano Beach, FL</option>
-            <option value="Boca Raton, FL">Boca Raton, FL</option>
-            <option value="New York, NY">New York, NY</option>
-            <option value="Houston, TX">Houston, TX</option>
-            <option value="Los Angeles, CA">Los Angeles, CA</option>
-          </optgroup>
-        </select>
-        <button type="submit" class="btn-search btn-brazil">Buscar 🔍</button>
+        <div class="input-wrap">
+          <span class="input-icon">🎯</span>
+          <input type="text" id="br-niche"
+            placeholder="Nicho — ex: salão de beleza, limpeza"
+            list="br-niche-list" required />
+          <datalist id="br-niche-list">
+            <option value="restaurante brasileiro">
+            <option value="salão de beleza">
+            <option value="barbearia brasileira">
+            <option value="limpeza residencial">
+            <option value="construção e reforma">
+            <option value="paisagismo">
+            <option value="padaria brasileira">
+            <option value="açougue brasileiro">
+            <option value="mercado brasileiro">
+            <option value="academia brasileira">
+            <option value="igreja evangélica">
+            <option value="escola de português">
+            <option value="buffet brasileiro">
+            <option value="advogado brasileiro">
+            <option value="clínica brasileira">
+          </datalist>
+        </div>
+        <div class="input-wrap">
+          <span class="input-icon">📍</span>
+          <select id="br-city" required>
+            <option value="">Selecione a cidade…</option>
+            <optgroup label="🗺️ New England — Comunidade Brasileira">
+              <option value="Framingham, MA">Framingham, MA — 🇧🇷 Pequeno Brasil</option>
+              <option value="Marlborough, MA">Marlborough, MA</option>
+              <option value="Hudson, MA">Hudson, MA</option>
+              <option value="Somerville, MA">Somerville, MA</option>
+              <option value="Everett, MA">Everett, MA</option>
+              <option value="Malden, MA">Malden, MA</option>
+              <option value="Fall River, MA">Fall River, MA</option>
+              <option value="Boston, MA">Boston, MA</option>
+              <option value="Providence, RI">Providence, RI</option>
+            </optgroup>
+            <optgroup label="🌎 Outros estados">
+              <option value="Miami, FL">Miami, FL</option>
+              <option value="Orlando, FL">Orlando, FL</option>
+              <option value="Newark, NJ">Newark, NJ</option>
+              <option value="Pompano Beach, FL">Pompano Beach, FL</option>
+              <option value="Boca Raton, FL">Boca Raton, FL</option>
+              <option value="New York, NY">New York, NY</option>
+              <option value="Houston, TX">Houston, TX</option>
+              <option value="Los Angeles, CA">Los Angeles, CA</option>
+            </optgroup>
+          </select>
+        </div>
+        <button type="submit" class="btn-search btn-brazil">Buscar <span class="btn-arrow">→</span></button>
       </div>
     </form>
 
+    <!-- ── Status ── -->
     <div id="status"></div>
 
-    <!-- Result area -->
+    <!-- ── Results area ── -->
     <div id="tabs-wrapper" class="hidden">
       <div class="tabs">
-        <button class="tab-btn active" data-tab="results">📋 Results</button>
+        <button class="tab-btn active" data-tab="results">📋 Resultados</button>
         <button class="tab-btn" data-tab="outreach">✉️ Outreach</button>
-        <button class="tab-btn" data-tab="history">🕓 History</button>
+        <button class="tab-btn" data-tab="history">🕓 Histórico</button>
       </div>
 
       <!-- Results -->
@@ -97,7 +119,6 @@
           <button id="export-btn">⬇️ Export CSV</button>
         </div>
 
-        <!-- Filter bar -->
         <div class="filter-bar">
           <label class="filter-item">
             <input type="checkbox" id="filter-pt"> 🇧🇷 Só PT
@@ -115,7 +136,7 @@
               <tr>
                 <th>#</th>
                 <th></th>
-                <th data-sort="name" class="sortable">Business Name ↕</th>
+                <th data-sort="name" class="sortable">Business ↕</th>
                 <th>Phone</th>
                 <th>Website</th>
                 <th>Instagram</th>
@@ -133,7 +154,7 @@
 
       <!-- Outreach -->
       <div id="tab-outreach" class="tab-content">
-        <p class="tab-hint">Click any message to copy it to your clipboard.</p>
+        <p class="tab-hint">Clique em qualquer mensagem para copiar.</p>
         <div id="outreach-list"></div>
       </div>
 
@@ -142,7 +163,12 @@
         <div id="history-list"></div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /container -->
+
+  <footer class="site-footer">
+    <span>LenzLead · by Lucas Lenzi</span>
+  </footer>
 
   <script src="app.js"></script>
 </body>
