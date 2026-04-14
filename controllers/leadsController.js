@@ -4,69 +4,71 @@
  * Fetch → Clean → Score → Outreach → Export → Save History
  */
 
-const { searchBusinesses }   = require('../services/placesService');
-const { cleanLeads }         = require('../services/cleaningService');
-const { scoreLeads }         = require('../services/scoringService');
+const { searchBusinesses }    = require('../services/placesService');
+const { cleanLeads }          = require('../services/cleaningService');
+const { scoreLeads }          = require('../services/scoringService');
 const { addOutreachMessages } = require('../services/outreachService');
-const { exportToCSV }        = require('../services/exportService');
-const { saveSearch, readHistory } = require('../services/historyService');
-const { getExportPath }      = require('../services/exportService');
-const path = require('path');
+const { exportToCSV, getExportPath } = require('../services/exportService');
+const { saveSearch, readHistory }    = require('../services/historyService');
 const fs   = require('fs');
 
 /**
  * POST /api/leads
- * Main search endpoint — runs the full automated pipeline.
+ * Accepts: { niche, city, brazilTab? }
+ * Runs the full automated pipeline and returns processed leads + CSV filename.
  */
 async function getLeads(req, res) {
-  const { niche, city } = req.body;
+  const { niche, city, brazilTab = false } = req.body;
 
   if (!niche || !city) {
     return res.status(400).json({ error: 'Both "niche" and "city" are required.' });
   }
 
   try {
-    // 1. Fetch raw leads from Google Places
-    const raw = await searchBusinesses(niche.trim(), city.trim());
+    // 1. Fetch raw leads (includes Instagram scraping)
+    const raw = await searchBusinesses(niche.trim(), city.trim(), { brazilTab });
 
-    // 2. Clean: normalize phone/website, remove duplicates
+    // 2. Normalize phone/website, remove duplicates
     const cleaned = cleanLeads(raw);
 
-    // 3. Score: rank by completeness + business potential
+    // 3. Score and rank
     const scored = scoreLeads(cleaned);
 
-    // 4. Outreach: generate a message per lead
+    // 4. Generate outreach messages (EN or PT-BR based on brazilTab)
     const leads = addOutreachMessages(scored);
 
-    // 5. Export to CSV automatically
+    // 5. Auto-export to CSV
     const csvFile = exportToCSV(leads, niche.trim(), city.trim());
 
-    // 6. Save to search history
-    saveSearch({ niche: niche.trim(), city: city.trim(), totalLeads: leads.length, csvFile });
+    // 6. Save to local history
+    saveSearch({
+      niche:      niche.trim(),
+      city:       city.trim(),
+      brazilTab,
+      totalLeads: leads.length,
+      csvFile,
+    });
 
     return res.json({ leads, csvFile });
   } catch (err) {
-    console.error('Pipeline error:', err.message);
-    return res.status(500).json({ error: 'Failed to fetch leads. Check your API key and try again.' });
+    console.error('[leadsController] Pipeline error:', err.message);
+    return res.status(500).json({ error: err.message || 'Failed to fetch leads.' });
   }
 }
 
 /**
- * GET /api/history
- * Returns the saved search history.
+ * GET /api/leads/history
  */
 function getHistory(req, res) {
   try {
-    const history = readHistory();
-    return res.json({ history });
+    return res.json({ history: readHistory() });
   } catch (err) {
     return res.status(500).json({ error: 'Could not read history.' });
   }
 }
 
 /**
- * GET /api/export/:filename
- * Download a previously generated CSV file.
+ * GET /api/leads/export/:filename
  */
 function downloadExport(req, res) {
   const { filename } = req.params;

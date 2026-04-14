@@ -1,32 +1,31 @@
 /**
  * exportService.js
  * Generates a CSV file from leads and saves it to data/exports/.
- * No external libraries needed — uses Node's built-in fs module.
+ * Uses Node's built-in fs — no external libraries needed.
  */
 
-const fs = require('fs');
+const fs   = require('fs');
 const path = require('path');
 
 const EXPORTS_DIR = path.join(__dirname, '../data/exports');
 
-/** Ensure the exports directory exists */
 function ensureExportsDir() {
   if (!fs.existsSync(EXPORTS_DIR)) {
     fs.mkdirSync(EXPORTS_DIR, { recursive: true });
   }
 }
 
-/** Escape a CSV cell value (wrap in quotes if it contains commas, quotes, or newlines) */
+/** Escape a CSV cell: wrap in double-quotes if it contains commas, quotes, or newlines */
 function escapeCell(value) {
   if (value === null || value === undefined) return '';
   const str = String(value);
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;
 }
 
-/** Generate a safe filename from niche + city + date */
+/** Build a safe filename from niche + city + date */
 function buildFilename(niche, city) {
   const slug = `${niche}_${city}`
     .toLowerCase()
@@ -36,14 +35,16 @@ function buildFilename(niche, city) {
   return `${slug}_${date}.csv`;
 }
 
-/** Convert leads array to a CSV string */
+/** Convert leads array to a CSV string (Instagram column after Website) */
 function leadsToCSV(leads) {
   const headers = [
+    'Flag',
     'Name',
     'City',
     'Niche',
     'Phone',
     'Website',
+    'Instagram',
     'Rating',
     'Reviews',
     'Score',
@@ -52,11 +53,13 @@ function leadsToCSV(leads) {
   ];
 
   const rows = leads.map((lead) => [
+    lead.brazilTab ? '🇧🇷' : '🇺🇸',
     lead.name,
     lead.city,
     lead.niche,
     lead.phone,
     lead.website,
+    lead.instagram,
     lead.rating,
     lead.reviewCount,
     lead.score,
@@ -76,14 +79,12 @@ function exportToCSV(leads, niche, city) {
   ensureExportsDir();
   const filename = buildFilename(niche, city);
   const filepath = path.join(EXPORTS_DIR, filename);
-  const csvContent = leadsToCSV(leads);
-  fs.writeFileSync(filepath, csvContent, 'utf-8');
+  fs.writeFileSync(filepath, leadsToCSV(leads), 'utf-8');
   return filename;
 }
 
-/** Get the full path to an export file */
+/** Sanitize and return the full path to an export file */
 function getExportPath(filename) {
-  // Sanitize: only allow safe filenames (no path traversal)
   const safe = path.basename(filename);
   return path.join(EXPORTS_DIR, safe);
 }

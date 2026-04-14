@@ -3,29 +3,69 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lead Gen App</title>
+  <title>🎬 VideoLead Finder</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <div class="container">
     <header>
-      <h1>🎯 Local Lead Finder</h1>
-      <p class="subtitle">Find, score, and message local businesses — automatically</p>
+      <h1>🎬 VideoLead Finder</h1>
+      <p class="subtitle">Find local businesses that need your video services — in the USA and Brazilian communities</p>
     </header>
 
-    <!-- Search Form -->
-    <form id="search-form">
+    <!-- Market selector -->
+    <div class="market-tabs">
+      <button class="market-tab active" data-market="us">🇺🇸 US Market</button>
+      <button class="market-tab" data-market="brazil">🇧🇷 Brazilian Community</button>
+    </div>
+
+    <!-- US Market Form -->
+    <form id="form-us" class="search-form active-form">
       <div class="form-group">
-        <input type="text" id="niche" placeholder="Niche (e.g. barbershop, dentist)" required />
-        <input type="text" id="city" placeholder="City (e.g. Austin, TX)" required />
-        <button type="submit" id="search-btn">Search</button>
+        <input type="text" id="us-niche" placeholder="Niche (e.g. barbershop, dentist, gym)" required />
+        <input type="text" id="us-city"  placeholder="City (e.g. Miami, FL)" required />
+        <button type="submit" class="btn-search">Search 🔍</button>
+      </div>
+    </form>
+
+    <!-- Brazilian Community Form -->
+    <form id="form-brazil" class="search-form" style="display:none">
+      <div class="form-group">
+        <input type="text" id="br-niche"
+          placeholder="Nicho (ex: restaurante brasileiro)"
+          list="br-niche-list" required />
+        <datalist id="br-niche-list">
+          <option value="restaurante brasileiro">
+          <option value="academia brasileira">
+          <option value="igreja evangélica">
+          <option value="salão de beleza">
+          <option value="escola de português">
+          <option value="buffet brasileiro">
+          <option value="mercado brasileiro">
+          <option value="advogado brasileiro">
+          <option value="clínica brasileira">
+        </datalist>
+        <select id="br-city" required>
+          <option value="">Selecione a cidade…</option>
+          <option value="Miami, FL">Miami, FL</option>
+          <option value="Orlando, FL">Orlando, FL</option>
+          <option value="Newark, NJ">Newark, NJ</option>
+          <option value="Framingham, MA">Framingham, MA</option>
+          <option value="Pompano Beach, FL">Pompano Beach, FL</option>
+          <option value="Boca Raton, FL">Boca Raton, FL</option>
+          <option value="Boston, MA">Boston, MA</option>
+          <option value="New York, NY">New York, NY</option>
+          <option value="Houston, TX">Houston, TX</option>
+          <option value="Los Angeles, CA">Los Angeles, CA</option>
+        </select>
+        <button type="submit" class="btn-search btn-brazil">Buscar 🔍</button>
       </div>
     </form>
 
     <div id="status"></div>
 
-    <!-- Tabs -->
+    <!-- Result area -->
     <div id="tabs-wrapper" class="hidden">
       <div class="tabs">
         <button class="tab-btn active" data-tab="results">📋 Results</button>
@@ -33,7 +73,7 @@
         <button class="tab-btn" data-tab="history">🕓 History</button>
       </div>
 
-      <!-- Tab: Results -->
+      <!-- Results -->
       <div id="tab-results" class="tab-content active">
         <div class="tab-header">
           <span id="results-title"></span>
@@ -44,9 +84,11 @@
             <thead>
               <tr>
                 <th>#</th>
+                <th></th>
                 <th>Business Name</th>
                 <th>Phone</th>
                 <th>Website</th>
+                <th>Instagram</th>
                 <th>Rating</th>
                 <th>Reviews</th>
                 <th>Score</th>
@@ -57,13 +99,13 @@
         </div>
       </div>
 
-      <!-- Tab: Outreach -->
+      <!-- Outreach -->
       <div id="tab-outreach" class="tab-content">
-        <p class="tab-hint">Click a message to copy it to your clipboard.</p>
+        <p class="tab-hint">Click any message to copy it to your clipboard.</p>
         <div id="outreach-list"></div>
       </div>
 
-      <!-- Tab: History -->
+      <!-- History -->
       <div id="tab-history" class="tab-content">
         <div id="history-list"></div>
       </div>
