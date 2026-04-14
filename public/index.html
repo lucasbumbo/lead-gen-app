@@ -37,27 +37,44 @@
           list="br-niche-list" required />
         <datalist id="br-niche-list">
           <option value="restaurante brasileiro">
+          <option value="salão de beleza">
+          <option value="barbearia brasileira">
+          <option value="limpeza residencial">
+          <option value="construção e reforma">
+          <option value="paisagismo">
+          <option value="padaria brasileira">
+          <option value="açougue brasileiro">
+          <option value="mercado brasileiro">
           <option value="academia brasileira">
           <option value="igreja evangélica">
-          <option value="salão de beleza">
           <option value="escola de português">
           <option value="buffet brasileiro">
-          <option value="mercado brasileiro">
           <option value="advogado brasileiro">
           <option value="clínica brasileira">
         </datalist>
         <select id="br-city" required>
           <option value="">Selecione a cidade…</option>
-          <option value="Miami, FL">Miami, FL</option>
-          <option value="Orlando, FL">Orlando, FL</option>
-          <option value="Newark, NJ">Newark, NJ</option>
-          <option value="Framingham, MA">Framingham, MA</option>
-          <option value="Pompano Beach, FL">Pompano Beach, FL</option>
-          <option value="Boca Raton, FL">Boca Raton, FL</option>
-          <option value="Boston, MA">Boston, MA</option>
-          <option value="New York, NY">New York, NY</option>
-          <option value="Houston, TX">Houston, TX</option>
-          <option value="Los Angeles, CA">Los Angeles, CA</option>
+          <optgroup label="🗺️ New England (comunidade brasileira)">
+            <option value="Framingham, MA">Framingham, MA — 🇧🇷 Pequeno Brasil</option>
+            <option value="Marlborough, MA">Marlborough, MA</option>
+            <option value="Hudson, MA">Hudson, MA</option>
+            <option value="Somerville, MA">Somerville, MA</option>
+            <option value="Everett, MA">Everett, MA</option>
+            <option value="Malden, MA">Malden, MA</option>
+            <option value="Fall River, MA">Fall River, MA</option>
+            <option value="Boston, MA">Boston, MA</option>
+            <option value="Providence, RI">Providence, RI</option>
+          </optgroup>
+          <optgroup label="🌎 Outros estados">
+            <option value="Miami, FL">Miami, FL</option>
+            <option value="Orlando, FL">Orlando, FL</option>
+            <option value="Newark, NJ">Newark, NJ</option>
+            <option value="Pompano Beach, FL">Pompano Beach, FL</option>
+            <option value="Boca Raton, FL">Boca Raton, FL</option>
+            <option value="New York, NY">New York, NY</option>
+            <option value="Houston, TX">Houston, TX</option>
+            <option value="Los Angeles, CA">Los Angeles, CA</option>
+          </optgroup>
         </select>
         <button type="submit" class="btn-search btn-brazil">Buscar 🔍</button>
       </div>
@@ -93,6 +110,7 @@
                 <th>Reviews</th>
                 <th>Score</th>
                 <th>Source</th>
+                <th>🇧🇷 PT?</th>
               </tr>
             </thead>
             <tbody id="results-body"></tbody>

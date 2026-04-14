@@ -37,38 +37,56 @@ async function getPlaceDetails(placeId, apiKey) {
 }
 
 /**
- * Scrape a business website and look for an Instagram handle in the HTML.
- * Returns "https://instagram.com/HANDLE" or null.
+ * Check if HTML content appears to be in Portuguese.
  */
-async function scrapeInstagram(websiteUrl) {
-  if (!websiteUrl) return null;
+function detectPortuguese(html) {
+  if (!html) return false;
+  if (/lang=["'][Pp][Tt]/i.test(html)) return true;
+  const lower = html.toLowerCase();
+  const ptWords = [
+    'serviços', 'sobre nós', 'contato', 'produtos', 'empresa',
+    'atendimento', 'bem-vindo', 'nosso', 'nossa', 'também',
+    'clique aqui', 'saiba mais', 'fale conosco', 'início',
+  ];
+  return ptWords.filter((w) => lower.includes(w)).length >= 2;
+}
+
+/**
+ * Scrape a business website for Instagram handle + Portuguese language signal.
+ * Returns { instagram, portugueseSite } — one HTTP request, two insights.
+ */
+async function scrapeWebsite(websiteUrl) {
+  if (!websiteUrl) return { instagram: null, portugueseSite: false };
 
   try {
     const res = await axios.get(websiteUrl, {
       timeout: 6000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; LeadGenBot/1.0)',
-      },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LeadGenBot/1.0)' },
       maxRedirects: 3,
     });
 
-    const html    = res.data || '';
-    // Match instagram.com/HANDLE in any attribute or text
-    const pattern = /instagram\.com\/([a-zA-Z0-9._]+)/g;
-    let match;
+    const html           = res.data || '';
+    const portugueseSite = detectPortuguese(html);
 
+    const pattern = /instagram\.com\/([a-zA-Z0-9._]+)/g;
+    let instagram = null;
+    let match;
     while ((match = pattern.exec(html)) !== null) {
-      const handle = match[1].replace(/[/?#].*$/, ''); // strip trailing query/fragment
+      const handle = match[1].replace(/[/?#].*$/, '');
       if (!IGNORED_HANDLES.has(handle.toLowerCase()) && handle.length > 1) {
-        return `https://instagram.com/${handle}`;
+        instagram = `https://instagram.com/${handle}`;
+        break;
       }
     }
-    return null;
-  } catch (err) {
-    // Timeout or unreachable site — not a fatal error
-    return null;
+
+    return { instagram, portugueseSite };
+  } catch {
+    return { instagram: null, portugueseSite: false };
   }
 }
+
+// Keep old export for any external callers
+const scrapeInstagram = async (url) => (await scrapeWebsite(url)).instagram;
 
 /**
  * Search for local businesses by niche and city.
@@ -120,21 +138,22 @@ async function searchBusinesses(niche, city, options = {}) {
   // Fetch details + scrape Instagram for up to 10 results in parallel
   const leads = await Promise.all(
     places.slice(0, 10).map(async (place) => {
-      const details   = await getPlaceDetails(place.place_id, apiKey);
-      const instagram = await scrapeInstagram(details.website);
+      const details                    = await getPlaceDetails(place.place_id, apiKey);
+      const { instagram, portugueseSite } = await scrapeWebsite(details.website);
 
       return {
-        name:        place.name || null,
+        name:          place.name || null,
         city,
         niche,
-        phone:       details.phone,
-        website:     details.website,
+        phone:         details.phone,
+        website:       details.website,
         instagram,
-        rating:      place.rating || null,
-        reviewCount: place.user_ratings_total || null,
-        address:     place.formatted_address || null,
+        portugueseSite,
+        rating:        place.rating || null,
+        reviewCount:   place.user_ratings_total || null,
+        address:       place.formatted_address || null,
         brazilTab,
-        source:      'Google',
+        source:        'Google',
       };
     })
   );

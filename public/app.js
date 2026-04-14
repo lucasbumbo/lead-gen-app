@@ -147,6 +147,7 @@ function renderResults(leads, niche, city, brazilTab) {
         <span class="score-num" style="margin-left:4px;color:#888;font-size:0.75rem">${lead.score}pts</span>
       </td>
       <td><span class="source-badge source-${(lead.source||'').toLowerCase()}">${esc(lead.source||'—')}</span></td>
+      <td>${lead.portugueseSite ? '<span class="pt-badge">🇧🇷 PT</span>' : '<span class="na">—</span>'}</td>
     `;
     resultsBody.appendChild(row);
   });

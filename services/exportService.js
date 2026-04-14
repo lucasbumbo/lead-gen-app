@@ -51,6 +51,7 @@ function leadsToCSV(leads) {
     'Score Label',
     'Outreach Message',
     'Source',
+    'PT Site',
   ];
 
   const rows = leads.map((lead) => [
@@ -66,6 +67,8 @@ function leadsToCSV(leads) {
     lead.score,
     lead.scoreLabel,
     lead.outreachMessage,
+    lead.source,
+    lead.portugueseSite ? 'Yes' : 'No',
   ]);
 
   const lines = [headers, ...rows].map((row) => row.map(escapeCell).join(','));
