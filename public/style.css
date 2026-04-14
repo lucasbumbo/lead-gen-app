@@ -400,3 +400,128 @@ td a:hover { text-decoration: underline; }
   background: #e8f5e9;
   color: #2e7d32;
 }
+
+/* ── Loading spinner ── */
+#status.loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+}
+#status.loading::before {
+  content: '';
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid #ddd;
+  border-top-color: #4f8ef7;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Filter bar ── */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #444;
+}
+.filter-select {
+  padding: 4px 10px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: white;
+  cursor: pointer;
+}
+
+/* ── Sortable headers ── */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+th.sortable:hover { background: #e8edf5; }
+th.sort-desc::after { content: ' ▼'; font-size: 0.7rem; }
+th.sort-asc::after  { content: ' ▲'; font-size: 0.7rem; }
+
+/* ── WhatsApp button ── */
+.wa-btn {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 1rem;
+  text-decoration: none;
+  vertical-align: middle;
+  line-height: 1;
+  transition: transform 0.15s;
+}
+.wa-btn:hover { transform: scale(1.25); }
+
+/* ── Phone copy ── */
+.phone-copy {
+  cursor: pointer;
+  border-bottom: 1px dashed #aaa;
+}
+.phone-copy:hover { color: #4f8ef7; border-color: #4f8ef7; }
+.copied-inline { color: #27ae60 !important; }
+
+/* ── Contacted row ── */
+.contacted-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  cursor: pointer;
+}
+.contacted-cb { margin-top: 3px; cursor: pointer; flex-shrink: 0; }
+tr.contacted td { opacity: 0.5; }
+tr.contacted td:first-child::after {
+  content: ' ✓';
+  color: #27ae60;
+  font-size: 0.75rem;
+}
+
+/* ── Lead address ── */
+.lead-address {
+  font-size: 0.72rem;
+  color: #999;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+/* ── WhatsApp outreach message ── */
+.wa-msg-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #25d366;
+  margin-top: 14px;
+  margin-bottom: 4px;
+}
+.wa-message {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+.wa-message:hover { border-color: #25d366 !important; }
+
+/* ── Mobile responsive ── */
+@media (max-width: 768px) {
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 700px; }
+  h1 { font-size: 1.4rem; }
+  .form-group { flex-direction: column; }
+  .form-group input,
+  .form-group select,
+  .form-group button { width: 100%; }
+  .tab-header { flex-direction: column; gap: 8px; align-items: flex-start; }
+  .filter-bar { gap: 8px; }
+}

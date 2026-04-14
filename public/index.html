@@ -96,19 +96,32 @@
           <span id="results-title"></span>
           <button id="export-btn">⬇️ Export CSV</button>
         </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <label class="filter-item">
+            <input type="checkbox" id="filter-pt"> 🇧🇷 Só PT
+          </label>
+          <select id="filter-source" class="filter-select">
+            <option value="all">Todas as fontes</option>
+            <option value="google">Google</option>
+            <option value="foursquare">Foursquare</option>
+          </select>
+        </div>
+
         <div class="table-scroll">
           <table>
             <thead>
               <tr>
                 <th>#</th>
                 <th></th>
-                <th>Business Name</th>
+                <th data-sort="name" class="sortable">Business Name ↕</th>
                 <th>Phone</th>
                 <th>Website</th>
                 <th>Instagram</th>
-                <th>Rating</th>
-                <th>Reviews</th>
-                <th>Score</th>
+                <th data-sort="rating" class="sortable">Rating ↕</th>
+                <th data-sort="reviewCount" class="sortable">Reviews ↕</th>
+                <th data-sort="score" class="sortable">Score ↕</th>
                 <th>Source</th>
                 <th>🇧🇷 PT?</th>
               </tr>
