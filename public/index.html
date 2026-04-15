@@ -184,6 +184,61 @@
 
   </div><!-- /container -->
 
+  <!-- ── Lead Detail Drawer ── -->
+  <div id="lead-drawer-backdrop" class="drawer-backdrop" onclick="closeLeadDetail()"></div>
+  <div id="lead-drawer" class="lead-drawer">
+    <div class="drawer-header">
+      <div class="drawer-header-left">
+        <span id="drawer-flag"></span>
+        <div>
+          <div id="drawer-name" class="drawer-name"></div>
+          <div id="drawer-insight" class="drawer-insight"></div>
+        </div>
+      </div>
+      <div class="drawer-header-right">
+        <span id="drawer-badge"></span>
+        <button class="drawer-close" onclick="closeLeadDetail()">✕</button>
+      </div>
+    </div>
+
+    <div class="drawer-body">
+
+      <!-- Info grid -->
+      <div class="drawer-section">
+        <div class="drawer-info-grid" id="drawer-info-grid"></div>
+      </div>
+
+      <div class="drawer-divider"></div>
+
+      <!-- CRM Status -->
+      <div class="drawer-section">
+        <div class="drawer-label">PIPELINE STATUS</div>
+        <div class="drawer-crm-pills" id="drawer-crm-pills"></div>
+      </div>
+
+      <div class="drawer-divider"></div>
+
+      <!-- Outreach message -->
+      <div class="drawer-section">
+        <div class="drawer-label">MENSAGEM DE OUTREACH</div>
+        <pre class="drawer-message" id="drawer-message" onclick="drawerCopyPitch()"></pre>
+        <div class="drawer-copy-hint" id="drawer-copy-hint">Clique na mensagem para copiar</div>
+      </div>
+
+      <div class="drawer-divider"></div>
+
+      <!-- Notes -->
+      <div class="drawer-section">
+        <div class="drawer-label">ANOTAÇÕES</div>
+        <textarea class="drawer-notes" id="drawer-notes"
+          placeholder="Adicione notas sobre esse lead..."
+          oninput="autoResize(this)"
+          onblur="drawerSaveNote()"></textarea>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ── CRM Board View ── -->
   <div id="crm-view" style="display:none">
     <div class="crm-page-header">

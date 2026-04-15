@@ -212,7 +212,7 @@ function renderResults(leads, niche, city, brazilTab) {
       <label class="contacted-wrap" title="${contactedSet.has(lead.name) ? 'Contactado' : 'Marcar como contactado'}">
         <input type="checkbox" class="contacted-cb" ${contactedSet.has(lead.name) ? 'checked' : ''}
           onchange="toggleContacted('${nameEscaped}', this)">
-        <strong>${esc(lead.name)}</strong>
+        <strong class="lead-name-link" onclick="openLeadDetail('${nameEscaped}')" title="Ver detalhes">${esc(lead.name)}</strong>
       </label>
       ${addrLine}
       ${insightLine}
@@ -454,6 +454,111 @@ function copyPitch(name) {
       }
     });
   });
+}
+
+/* ═══════════════════════════════════════════════════
+   LEAD DETAIL DRAWER
+   ═══════════════════════════════════════════════════ */
+
+let _drawerLead = null; // currently open lead
+
+function openLeadDetail(name) {
+  const lead = leadsMap[name];
+  if (!lead) return;
+  _drawerLead = lead;
+
+  // Header
+  document.getElementById('drawer-flag').textContent    = lead.brazilTab ? '🇧🇷' : '🇺🇸';
+  document.getElementById('drawer-name').textContent    = lead.name;
+  document.getElementById('drawer-insight').textContent = generateInsight(lead);
+  document.getElementById('drawer-badge').innerHTML     =
+    `<span class="badge ${badgeClass(lead.scoreLabel)}">${lead.scoreLabel}</span>`;
+
+  // Info grid
+  const rows = [
+    ['CIDADE',    lead.city],
+    ['TELEFONE',  lead.phone   || null],
+    ['WEBSITE',   lead.website ? `<a href="${esc(lead.website)}" target="_blank" rel="noopener">🌐 ${esc(shortenUrl(lead.website))}</a>` : null],
+    ['INSTAGRAM', lead.instagram ? `<a href="${esc(lead.instagram)}" target="_blank" rel="noopener" class="ig-link">📸 ${esc(lead.instagram.replace('https://instagram.com/','@'))}</a>` : null],
+    ['AVALIAÇÃO', lead.rating != null ? `⭐ ${lead.rating}` : null],
+    ['REVIEWS',   lead.reviewCount != null ? `${lead.reviewCount} reviews` : null],
+    ['ENDEREÇO',  lead.address || null],
+    ['FONTE',     lead.source  || null],
+  ].filter(([, v]) => v != null);
+
+  document.getElementById('drawer-info-grid').innerHTML = rows.map(([label, val]) => `
+    <div class="drawer-info-row">
+      <span class="drawer-info-label">${label}</span>
+      <span class="drawer-info-value">${val}</span>
+    </div>`).join('');
+
+  // CRM status pills
+  const currentCol = crmState[name]?.column || null;
+  document.getElementById('drawer-crm-pills').innerHTML = CRM_COLS.map((col) => `
+    <button class="drawer-crm-pill drawer-crm-pill-${col.id} ${currentCol === col.id ? 'active' : ''}"
+            onclick="drawerMoveLead('${esc(name).replace(/'/g,"\\'")}','${col.id}')">
+      ${col.icon} ${col.label}
+    </button>`).join('');
+
+  // Outreach message
+  const msg = lead.outreachMessage || '';
+  document.getElementById('drawer-message').textContent    = msg;
+  document.getElementById('drawer-copy-hint').textContent  = msg ? 'Clique na mensagem para copiar' : 'Nenhuma mensagem gerada';
+
+  // Notes
+  const notesEl = document.getElementById('drawer-notes');
+  notesEl.value = notesMap[name] || '';
+  setTimeout(() => autoResize(notesEl), 0);
+
+  // Open
+  document.getElementById('lead-drawer-backdrop').classList.add('open');
+  document.getElementById('lead-drawer').classList.add('open');
+  document.body.classList.add('drawer-open');
+}
+
+function closeLeadDetail() {
+  document.getElementById('lead-drawer-backdrop').classList.remove('open');
+  document.getElementById('lead-drawer').classList.remove('open');
+  document.body.classList.remove('drawer-open');
+  _drawerLead = null;
+}
+
+function drawerCopyPitch() {
+  const msg  = document.getElementById('drawer-message').textContent;
+  const hint = document.getElementById('drawer-copy-hint');
+  if (!msg) return;
+  navigator.clipboard.writeText(msg).then(() => {
+    hint.textContent = '✅ Copiado!';
+    hint.classList.add('copied');
+    setTimeout(() => {
+      hint.textContent = 'Clique na mensagem para copiar';
+      hint.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function drawerSaveNote() {
+  if (!_drawerLead) return;
+  const text = document.getElementById('drawer-notes').value;
+  saveNote(_drawerLead.name, text);
+  // Sync back to table row note if visible
+  const tableNote = document.querySelector(`tr[data-name="${_drawerLead.name.replace(/"/g,'\\"')}"] .lead-note`);
+  if (tableNote) tableNote.value = text;
+}
+
+function drawerMoveLead(name, colId) {
+  // Add to CRM if not already there
+  if (!crmState[name]) {
+    const lead = leadsMap[name];
+    if (lead) crmState[name] = { column: colId, addedAt: new Date().toISOString(), lead };
+  } else {
+    crmState[name].column = colId;
+  }
+  saveCrm();
+  // Refresh pills
+  document.querySelectorAll('.drawer-crm-pill').forEach((btn) => btn.classList.remove('active'));
+  const active = document.querySelector(`.drawer-crm-pill-${colId}`);
+  if (active) active.classList.add('active');
 }
 
 /* ═══════════════════════════════════════════════════
