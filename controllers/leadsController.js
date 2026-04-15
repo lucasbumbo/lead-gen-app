@@ -71,10 +71,15 @@ async function getLeads(req, res) {
 
   try {
     // 1. Fetch from Google Places + Foursquare in parallel
-    const [googleRaw, foursquareRaw] = await Promise.all([
-      searchBusinesses(cleanNiche, cleanCity, { brazilTab }),
+    // Google errors are non-fatal — Foursquare results still come through
+    const [googleResult, foursquareRaw] = await Promise.all([
+      searchBusinesses(cleanNiche, cleanCity, { brazilTab }).catch((err) => {
+        console.warn('[leadsController] Google Places failed (non-fatal):', err.message);
+        return [];
+      }),
       searchFoursquare(cleanNiche, cleanCity, { brazilTab }),
     ]);
+    const googleRaw = googleResult;
 
     const raw = [...googleRaw, ...foursquareRaw];
 

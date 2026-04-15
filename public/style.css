@@ -2,24 +2,28 @@
    LenzLead — Dark Mode Design System
    ───────────────────────────────────────────── */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 :root {
-  --bg:        #0a0e1a;
-  --surface:   #111827;
-  --surface2:  #1a2235;
-  --border:    #1f2d42;
-  --cyan:      #22d3ee;
-  --cyan-dim:  rgba(34,211,238,0.12);
-  --cyan-glow: rgba(34,211,238,0.25);
-  --green:     #4ade80;
-  --green-dim: rgba(74,222,128,0.12);
-  --text:      #e2e8f0;
-  --muted:     #64748b;
-  --muted2:    #94a3b8;
-  --red:       #f87171;
-  --orange:    #fb923c;
-  --pink:      #f472b6;
-  --radius:    10px;
-  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+  --bg:           #0d1117;
+  --surface:      #161b22;
+  --surface2:     #1c2128;
+  --border:       #21262d;
+  --border-strong:#30363d;
+  --cyan:         #22d3ee;
+  --cyan-dim:     rgba(34,211,238,0.12);
+  --cyan-glow:    rgba(34,211,238,0.25);
+  --green:        #4ade80;
+  --green-dim:    rgba(74,222,128,0.12);
+  --text:         #f0f6fc;
+  --muted:        #64748b;
+  --muted2:       #94a3b8;
+  --red:          #f87171;
+  --yellow:       #fde047;
+  --orange:       #fb923c;
+  --pink:         #f472b6;
+  --radius:       10px;
+  --shadow:       0 4px 24px rgba(0,0,0,0.5);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,7 +31,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -43,7 +47,7 @@ body {
   align-items: center;
   padding: 0 28px;
   gap: 12px;
-  background: rgba(10,14,26,0.85);
+  background: rgba(13,17,23,0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
@@ -78,29 +82,31 @@ body {
 /* ── Hero ── */
 .hero {
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 40px;
+  padding-top: 12px;
 }
 
 .hero-title {
-  font-size: 2.4rem;
+  font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  color: #fff;
-  margin-bottom: 12px;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #f0f6fc;
+  margin-bottom: 14px;
 }
 
 .hero-title .accent {
   color: var(--cyan);
-  text-shadow: 0 0 28px var(--cyan-glow);
+  text-shadow: 0 0 32px var(--cyan-glow);
 }
 
 .hero-sub {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--muted2);
-  max-width: 480px;
+  max-width: 500px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.65;
+  font-weight: 400;
 }
 
 /* ── Market Tabs ── */
@@ -145,7 +151,7 @@ body {
 /* ── Search Card ── */
 .search-card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: 16px;
   padding: 22px 24px;
   margin-bottom: 22px;
@@ -179,12 +185,13 @@ body {
 .input-wrap input[type="text"],
 .input-wrap select {
   width: 100%;
-  padding: 11px 14px 11px 38px;
+  padding: 12px 14px 12px 38px;
   background: var(--surface2);
-  border: 1.5px solid var(--border);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius);
   color: var(--text);
   font-size: 0.9rem;
+  font-family: inherit;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   -webkit-appearance: none;
@@ -206,17 +213,18 @@ body {
 
 /* Search button */
 .btn-search {
-  padding: 11px 28px;
+  padding: 12px 28px;
   background: var(--cyan);
-  color: #0a0e1a;
+  color: #0d1117;
   border: none;
   border-radius: var(--radius);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
   letter-spacing: 0.02em;
+  font-family: inherit;
 }
 
 .btn-arrow { margin-left: 4px; }
@@ -418,7 +426,14 @@ td {
 
 tr:last-child td { border-bottom: none; }
 
-tbody tr:hover { background: var(--surface2); }
+tbody tr {
+  transition: background 0.15s;
+  border-left: 2px solid transparent;
+}
+tbody tr:hover {
+  background: var(--surface2);
+  border-left-color: var(--cyan);
+}
 
 td a {
   color: var(--cyan);
@@ -454,10 +469,11 @@ th.sort-asc::after  { content: ' ▲'; font-size: 0.65rem; color: var(--cyan); }
   white-space: nowrap;
 }
 
-.badge-hot    { background: rgba(251,146,60,0.15);  color: var(--orange); border: 1px solid rgba(251,146,60,0.3); }
-.badge-strong { background: rgba(74,222,128,0.12);  color: var(--green);  border: 1px solid rgba(74,222,128,0.3); }
-.badge-good   { background: var(--cyan-dim);        color: var(--cyan);   border: 1px solid rgba(34,211,238,0.3); }
-.badge-cold   { background: rgba(100,116,139,0.12); color: var(--muted2); border: 1px solid rgba(100,116,139,0.3); }
+/* Badges match brief: 🔥 red · ⭐ yellow · 👍 green · ❄️ gray */
+.badge-hot    { background: rgba(248,113,113,0.12);  color: var(--red);    border: 1px solid rgba(248,113,113,0.28); }
+.badge-strong { background: rgba(74,222,128,0.12);   color: var(--green);  border: 1px solid rgba(74,222,128,0.3); }
+.badge-good   { background: rgba(253,224,71,0.12);   color: var(--yellow); border: 1px solid rgba(253,224,71,0.28); }
+.badge-cold   { background: rgba(100,116,139,0.1);   color: var(--muted2); border: 1px solid rgba(100,116,139,0.2); }
 
 .score-num {
   font-weight: 700;
@@ -907,8 +923,8 @@ body.drawer-open { overflow: hidden; }
   top: 0; right: 0; bottom: 0;
   width: 480px;
   max-width: 96vw;
-  background: #111827;
-  border-left: 1px solid var(--border);
+  background: var(--surface);
+  border-left: 1px solid var(--border-strong);
   z-index: 201;
   display: flex;
   flex-direction: column;
@@ -1204,7 +1220,7 @@ body.drawer-open { overflow: hidden; }
 }
 
 .crm-page-header {
-  background: rgba(10,14,26,0.9);
+  background: rgba(13,17,23,0.92);
   border-bottom: 1px solid var(--border);
   padding: 18px 24px;
   position: sticky;
@@ -1499,8 +1515,8 @@ body.drawer-open { overflow: hidden; }
 @media (max-width: 768px) {
   .container { padding: 20px 14px 48px; }
 
-  .hero-title { font-size: 1.75rem; }
-  .hero-sub   { font-size: 0.9rem; }
+  .hero-title { font-size: 2rem; }
+  .hero-sub   { font-size: 0.95rem; }
 
   .market-tabs { gap: 6px; }
   .market-tab  { padding: 8px 16px; font-size: 0.82rem; }
