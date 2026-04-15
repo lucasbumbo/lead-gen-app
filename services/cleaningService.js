@@ -4,18 +4,42 @@
  */
 
 /**
- * Normalize a phone number to (XXX) XXX-XXXX format.
- * Returns the original string if it can't be parsed cleanly.
+ * Normalize a phone number.
+ * - US 10-digit → (XXX) XXX-XXXX
+ * - US 11-digit with country code 1 → (XXX) XXX-XXXX
+ * - Brazilian +55 → +55 (XX) XXXXX-XXXX
+ * - Unknown → returned as-is
+ *
+ * BUG FIX: Original code only handled US formats. Brazilian numbers from the
+ * Google Places API arrive as "+55 11 98765-4321" (13 digits) and were returned
+ * unformatted and inconsistent with US numbers in the same result set.
  */
 function normalizePhone(phone) {
   if (!phone) return null;
   const digits = phone.replace(/\D/g, '');
-  // Handle US numbers: 10 digits or 11 digits starting with 1
+
+  // Brazilian number: starts with country code 55, 12–13 digits total
+  // e.g. 55 + 11 (area) + 98765-4321 (9-digit mobile) = 13 digits
+  // e.g. 55 + 11 (area) + 8765-4321  (8-digit landline) = 12 digits
+  if (digits.startsWith('55') && (digits.length === 12 || digits.length === 13)) {
+    const local = digits.slice(2);           // strip country code
+    const area  = local.slice(0, 2);
+    const num   = local.slice(2);
+    if (num.length === 9) {
+      return `+55 (${area}) ${num.slice(0, 5)}-${num.slice(5)}`;
+    }
+    if (num.length === 8) {
+      return `+55 (${area}) ${num.slice(0, 4)}-${num.slice(4)}`;
+    }
+  }
+
+  // US number: 11 digits starting with 1 (country code) or 10 digits
   const local = digits.length === 11 && digits.startsWith('1') ? digits.slice(1) : digits;
   if (local.length === 10) {
     return `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6)}`;
   }
-  return phone; // Return as-is if not parseable
+
+  return phone; // Return as-is if pattern unrecognised
 }
 
 /**
@@ -29,22 +53,26 @@ function normalizeWebsite(website) {
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     url = 'https://' + url;
   }
-  // Upgrade http to https
   url = url.replace(/^http:\/\//, 'https://');
-  // Remove trailing slash
   url = url.replace(/\/$/, '');
   return url;
 }
 
 /**
- * Remove duplicate leads by name (case-insensitive).
- * Keeps the first occurrence.
+ * Remove duplicate leads.
+ *
+ * BUG FIX: Original code deduped by name only (case-insensitive), which caused
+ * legitimate multi-location businesses (e.g. two "Pizza King" locations in the
+ * same city) to be incorrectly dropped. Fix uses name + normalised address so
+ * the same chain at a different address is kept.
  */
 function deduplicate(leads) {
   const seen = new Set();
   return leads.filter((lead) => {
-    const key = (lead.name || '').toLowerCase().trim();
-    if (!key || seen.has(key)) return false;
+    const name    = (lead.name    || '').toLowerCase().trim();
+    const address = (lead.address || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 30);
+    const key     = `${name}|${address}`;
+    if (!name || seen.has(key)) return false;
     seen.add(key);
     return true;
   });
@@ -57,7 +85,7 @@ function deduplicate(leads) {
 function cleanLeads(leads) {
   const normalized = leads.map((lead) => ({
     ...lead,
-    phone: normalizePhone(lead.phone),
+    phone:   normalizePhone(lead.phone),
     website: normalizeWebsite(lead.website),
   }));
   return deduplicate(normalized);

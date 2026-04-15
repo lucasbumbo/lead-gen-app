@@ -357,11 +357,30 @@ function copyText(text, el) {
 }
 
 /* ─── Utility: WhatsApp phone formatter ─── */
+// BUG FIX: Original code assumed 11+ digit numbers already had a country code,
+// which fails for Brazilian numbers stored as "(011) 98765-4321" (11 digits
+// with area code but no country code). WhatsApp needs +55 prepended for Brazil.
 function formatWAPhone(phone) {
   if (!phone) return null;
   const digits = phone.replace(/\D/g, '');
-  if (digits.length === 10) return '1' + digits;     // US number without country code
-  if (digits.length >= 11)  return digits;            // already has country code
+
+  // Already has Brazilian country code: 55 + 2-digit area + 8-9 digit number
+  if (digits.startsWith('55') && (digits.length === 12 || digits.length === 13)) {
+    return digits;
+  }
+
+  // Brazilian number without country code: 11 digits starting with area code
+  // (e.g. 011 + 9-digit mobile = 11 digits, or 11 + 9-digit = 11 digits)
+  if (digits.length === 11 && !digits.startsWith('1')) {
+    return '55' + digits;
+  }
+
+  // US number: 10 digits (no country code) → prepend 1
+  if (digits.length === 10) return '1' + digits;
+
+  // US number: 11 digits starting with 1 (country code already present)
+  if (digits.length === 11 && digits.startsWith('1')) return digits;
+
   return null;
 }
 
