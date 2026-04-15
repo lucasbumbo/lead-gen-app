@@ -121,6 +121,9 @@ async function runSearch(niche, city, brazilTab) {
     currentBrazil = brazilTab;
     currentCsvFile = data.csvFile || null;
 
+    // Auto-populate CRM board with new leads
+    crmAddLeads(leads);
+
     applyFilters();
     tabsWrapper.classList.remove('hidden');
     setStatus('');
@@ -452,6 +455,194 @@ function copyPitch(name) {
     });
   });
 }
+
+/* ═══════════════════════════════════════════════════
+   CRM BOARD
+   ═══════════════════════════════════════════════════ */
+
+const CRM_COLS = [
+  { id: 'new',       label: 'New Leads', icon: '🆕', accentVar: 'cyan'   },
+  { id: 'contacted', label: 'Contacted',  icon: '📤', accentVar: 'blue'   },
+  { id: 'followup',  label: 'Follow-up',  icon: '🔔', accentVar: 'yellow' },
+  { id: 'closed',    label: 'Closed',     icon: '✅', accentVar: 'green'  },
+];
+
+/* ─── CRM persistent state ─── */
+let crmState = {};
+try { crmState = JSON.parse(localStorage.getItem('vl_crm') || '{}'); } catch { crmState = {}; }
+
+function saveCrm() {
+  localStorage.setItem('vl_crm', JSON.stringify(crmState));
+}
+
+/**
+ * Auto-add new leads to the "new" column.
+ * Leads already on the board keep their existing column.
+ * Lead data (score, insight, etc.) is always refreshed.
+ */
+function crmAddLeads(leads) {
+  leads.forEach((lead) => {
+    if (!lead.name) return;
+    if (!crmState[lead.name]) {
+      crmState[lead.name] = { column: 'new', addedAt: new Date().toISOString(), lead };
+    } else {
+      crmState[lead.name].lead = lead; // refresh data, keep column
+    }
+  });
+  saveCrm();
+}
+
+/* ─── View toggle ─── */
+function openCrm() {
+  document.querySelector('.container').style.display = 'none';
+  document.getElementById('crm-view').style.display  = 'block';
+  renderCrmBoard();
+}
+
+function closeCrm() {
+  document.getElementById('crm-view').style.display  = 'none';
+  document.querySelector('.container').style.display = '';
+}
+
+/* ─── Board render ─── */
+function renderCrmBoard() {
+  const board    = document.getElementById('crm-board');
+  const subtitle = document.getElementById('crm-subtitle');
+  const total    = Object.keys(crmState).length;
+
+  subtitle.textContent = total === 0
+    ? 'Nenhum lead ainda — faça uma busca primeiro'
+    : `${total} lead${total !== 1 ? 's' : ''} rastreados`;
+
+  board.innerHTML = CRM_COLS.map((col) => {
+    const entries = Object.values(crmState)
+      .filter((v) => v.column === col.id)
+      .sort((a, b) => (b.lead?.score || 0) - (a.lead?.score || 0));
+    return renderCrmColumn(col, entries);
+  }).join('');
+}
+
+function renderCrmColumn(col, entries) {
+  const cards = entries.map((e) => renderCrmCard(e, col.id)).join('');
+  const empty = entries.length === 0
+    ? `<div class="crm-empty-col">Arraste leads aqui</div>`
+    : '';
+
+  return `
+    <div class="crm-col crm-col-${col.id}"
+         data-col="${col.id}"
+         ondragover="onDragOver(event)"
+         ondragleave="onDragLeave(event)"
+         ondrop="onDrop(event,'${col.id}')">
+      <div class="crm-col-header crm-col-header-${col.id}">
+        <span class="crm-col-name">${col.icon} ${col.label}</span>
+        <span class="crm-col-count crm-count-${col.id}">${entries.length}</span>
+      </div>
+      <div class="crm-col-body">
+        ${cards}${empty}
+      </div>
+    </div>`;
+}
+
+function renderCrmCard(entry, colId) {
+  const { lead } = entry;
+  if (!lead) return '';
+  const flag    = lead.brazilTab ? '🇧🇷' : '🇺🇸';
+  const nameEsc = esc(lead.name).replace(/'/g, '&#39;');
+  const sitePart = lead.website
+    ? `<a class="crm-btn crm-btn-site" href="${esc(lead.website)}" target="_blank" rel="noopener">🌐 Site</a>`
+    : '';
+
+  return `
+    <div class="crm-card crm-card-${colId}"
+         draggable="true"
+         data-name="${nameEsc}"
+         ondragstart="onDragStart(event)"
+         ondragend="onDragEnd(event)">
+      <div class="crm-card-top">
+        <span class="crm-card-name">${flag} ${esc(lead.name)}</span>
+        <span class="badge ${badgeClass(lead.scoreLabel)} crm-badge">${lead.scoreLabel}</span>
+      </div>
+      <div class="crm-card-meta">${esc(lead.city)}${lead.niche ? ` · ${esc(lead.niche)}` : ''}</div>
+      <div class="crm-card-insight">${generateInsight(lead)}</div>
+      <div class="crm-card-actions">
+        <button class="crm-btn crm-btn-pitch" onclick="crmCopyPitch('${nameEsc}')">📋 Pitch</button>
+        ${sitePart}
+        <button class="crm-btn crm-btn-remove" onclick="removeCrmLead('${nameEsc}')" title="Remover do board">✕</button>
+      </div>
+    </div>`;
+}
+
+/* ─── Drag & Drop ─── */
+let _dragName = null;
+
+function onDragStart(e) {
+  _dragName = e.currentTarget.dataset.name;
+  e.currentTarget.classList.add('crm-dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', _dragName);
+}
+
+function onDragEnd(e) {
+  e.currentTarget.classList.remove('crm-dragging');
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('crm-drag-over');
+}
+
+function onDragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    e.currentTarget.classList.remove('crm-drag-over');
+  }
+}
+
+function onDrop(e, colId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('crm-drag-over');
+  const name = _dragName || e.dataTransfer.getData('text/plain');
+  if (!name || !crmState[name]) return;
+  if (crmState[name].column === colId) return; // no-op: same column
+  crmState[name].column = colId;
+  saveCrm();
+  renderCrmBoard();
+  _dragName = null;
+}
+
+/* ─── CRM Actions ─── */
+function removeCrmLead(name) {
+  if (!crmState[name]) return;
+  delete crmState[name];
+  saveCrm();
+  renderCrmBoard();
+}
+
+function confirmClearCrm() {
+  if (confirm('Limpar todos os leads do CRM? Essa ação não pode ser desfeita.')) {
+    crmState = {};
+    saveCrm();
+    renderCrmBoard();
+  }
+}
+
+function crmCopyPitch(name) {
+  const entry = crmState[name];
+  if (!entry?.lead?.outreachMessage) return;
+  navigator.clipboard.writeText(entry.lead.outreachMessage).then(() => {
+    const sel = `.crm-card[data-name="${name.replace(/"/g, '\\"')}"] .crm-btn-pitch`;
+    const btn = document.querySelector(sel);
+    if (!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copiado!';
+    setTimeout(() => { btn.textContent = orig; }, 1800);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   END CRM BOARD
+   ═══════════════════════════════════════════════════ */
 
 function shortenUrl(url) {
   try { return new URL(url).hostname.replace('www.', ''); }

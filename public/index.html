@@ -13,6 +13,7 @@
   <nav class="navbar">
     <img src="logo.png" alt="LenzLead" class="nav-logo" />
     <span class="nav-badge">Beta</span>
+    <button class="nav-crm-btn" onclick="openCrm()">📋 CRM Board</button>
   </nav>
 
   <div class="container">
@@ -182,6 +183,23 @@
     </div>
 
   </div><!-- /container -->
+
+  <!-- ── CRM Board View ── -->
+  <div id="crm-view" style="display:none">
+    <div class="crm-page-header">
+      <div class="crm-page-header-inner">
+        <button class="crm-back-btn" onclick="closeCrm()">← Voltar</button>
+        <div class="crm-page-title-group">
+          <h2 class="crm-page-title">📋 CRM Board</h2>
+          <span class="crm-page-subtitle" id="crm-subtitle"></span>
+        </div>
+        <button class="crm-clear-btn" onclick="confirmClearCrm()">🗑 Limpar tudo</button>
+      </div>
+    </div>
+    <div class="crm-board-wrap">
+      <div class="crm-board" id="crm-board"></div>
+    </div>
+  </div>
 
   <footer class="site-footer">
     <span>LenzLead · by Lucas Lenzi</span>
