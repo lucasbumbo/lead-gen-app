@@ -733,6 +733,133 @@ tr.contacted td { opacity: 0.4; }
   box-shadow: 0 0 8px var(--cyan-glow);
 }
 
+/* ── 3-step how-it-works strip ── */
+.how-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.how-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 8px 18px;
+  transition: border-color 0.2s;
+}
+
+.how-step:hover { border-color: var(--cyan); }
+
+.how-num {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--cyan-dim);
+  border: 1px solid rgba(34,211,238,0.35);
+  color: var(--cyan);
+  font-size: 0.75rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.how-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted2);
+  white-space: nowrap;
+}
+
+.how-sep {
+  font-size: 1.1rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* ── Lead insight line ── */
+.lead-insight {
+  font-size: 0.72rem;
+  color: var(--cyan);
+  margin-top: 3px;
+  font-weight: 500;
+  opacity: 0.85;
+  white-space: normal;
+  max-width: 260px;
+  line-height: 1.4;
+}
+
+/* ── Quick action buttons ── */
+.action-row {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 9px;
+  border-radius: 7px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.18s;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.action-site {
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border-color: rgba(34,211,238,0.25);
+}
+.action-site:hover {
+  background: rgba(34,211,238,0.2);
+  box-shadow: 0 0 8px var(--cyan-glow);
+  color: var(--cyan);
+}
+
+.action-ig {
+  background: rgba(244,114,182,0.1);
+  color: var(--pink);
+  border-color: rgba(244,114,182,0.25);
+}
+.action-ig:hover {
+  background: rgba(244,114,182,0.2);
+  box-shadow: 0 0 8px rgba(244,114,182,0.2);
+  color: var(--pink);
+}
+
+.action-pitch {
+  background: var(--green-dim);
+  color: var(--green);
+  border-color: rgba(74,222,128,0.25);
+}
+.action-pitch:hover {
+  background: rgba(74,222,128,0.2);
+  box-shadow: 0 0 8px rgba(74,222,128,0.2);
+}
+.action-copied {
+  background: rgba(74,222,128,0.25) !important;
+  color: var(--green) !important;
+}
+
+.action-disabled {
+  background: rgba(100,116,139,0.1);
+  color: var(--muted);
+  border-color: rgba(100,116,139,0.2);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 /* ── Mobile responsive ── */
 @media (max-width: 768px) {
   .container { padding: 20px 14px 48px; }

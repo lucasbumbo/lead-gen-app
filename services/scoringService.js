@@ -43,10 +43,10 @@ function scoreLead(lead) {
   const score = Math.min(pts, 100);
 
   let label;
-  if (score >= 80)      label = 'Hot Lead 🔥';
-  else if (score >= 60) label = 'Strong Lead ⭐';
-  else if (score >= 40) label = 'Good Lead 👍';
-  else                  label = 'Cold Lead ❄️';
+  if (score >= 80)      label = '🔥 High Opportunity';
+  else if (score >= 60) label = '⭐ Good Lead';
+  else if (score >= 40) label = '👍 Solid Lead';
+  else                  label = '❄️ Cold Lead';
 
   return {
     ...lead,

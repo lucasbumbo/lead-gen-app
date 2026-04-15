@@ -12,6 +12,7 @@ const historyList  = document.getElementById('history-list');
 
 let currentCsvFile = null;
 let activeMarket   = 'us';
+let leadsMap       = {}; // name → lead, for Quick Actions
 
 /* ─── Global state for filtering / sorting ─── */
 let allLeads      = [];
@@ -180,18 +181,14 @@ function renderResults(leads, niche, city, brazilTab) {
   const flag = brazilTab ? '🇧🇷' : '🇺🇸';
   resultsTitle.textContent = `${flag} ${leads.length} leads — "${niche}" in ${city}`;
   resultsBody.innerHTML = '';
+  leadsMap = {};
 
-  leads.forEach((lead, i) => {
+  leads.forEach((lead) => {
+    leadsMap[lead.name] = lead;
+
     const row = document.createElement('tr');
     row.dataset.name = lead.name || '';
     if (contactedSet.has(lead.name)) row.classList.add('contacted');
-
-    // Instagram cell
-    let igCell = '<span class="na">—</span>';
-    if (lead.instagram) {
-      const handle = lead.instagram.replace('https://instagram.com/', '');
-      igCell = `<a class="ig-link" href="${esc(lead.instagram)}" target="_blank" rel="noopener">📸 @${esc(handle)}</a>`;
-    }
 
     // Phone cell — with copy + WhatsApp
     let phoneCell = '<span class="na">—</span>';
@@ -203,12 +200,11 @@ function renderResults(leads, niche, city, brazilTab) {
       phoneCell = `<span class="phone-copy" onclick="copyText('${esc(lead.phone)}', this)" title="Click to copy">${esc(lead.phone)}</span>${waBtn}`;
     }
 
-    // Name cell — with address + contacted checkbox + notes
-    const addrLine = lead.address
-      ? `<div class="lead-address">${esc(lead.address)}</div>`
-      : '';
-    const savedNote = notesMap[lead.name] || '';
+    // Name cell — checkbox + address + insight line + notes
     const nameEscaped = esc(lead.name).replace(/'/g, '&#39;');
+    const addrLine    = lead.address ? `<div class="lead-address">${esc(lead.address)}</div>` : '';
+    const insightLine = `<div class="lead-insight">${generateInsight(lead)}</div>`;
+    const savedNote   = notesMap[lead.name] || '';
     const nameCell = `
       <label class="contacted-wrap" title="${contactedSet.has(lead.name) ? 'Contactado' : 'Marcar como contactado'}">
         <input type="checkbox" class="contacted-cb" ${contactedSet.has(lead.name) ? 'checked' : ''}
@@ -216,29 +212,30 @@ function renderResults(leads, niche, city, brazilTab) {
         <strong>${esc(lead.name)}</strong>
       </label>
       ${addrLine}
+      ${insightLine}
       <textarea class="lead-note" placeholder="📝 Anotação…" rows="1"
         onblur="saveNote('${nameEscaped}', this.value)"
         oninput="autoResize(this)">${esc(savedNote)}</textarea>`;
 
+    // Quick Actions cell
+    const siteBtn = lead.website
+      ? `<a class="action-btn action-site" href="${esc(lead.website)}" target="_blank" rel="noopener" title="${esc(lead.website)}">🌐 Site</a>`
+      : `<span class="action-btn action-disabled" title="No website">🌐 Site</span>`;
+    const igSearchUrl = `https://www.instagram.com/explore/search/keyword/?q=${encodeURIComponent(lead.name)}`;
+    const igBtn   = `<a class="action-btn action-ig" href="${igSearchUrl}" target="_blank" rel="noopener" title="Search on Instagram">📸 IG</a>`;
+    const pitchBtn = `<button class="action-btn action-pitch" onclick="copyPitch('${nameEscaped}')" title="Copy pitch message">📋 Pitch</button>`;
+    const actionsCell = `<div class="action-row">${siteBtn}${igBtn}${pitchBtn}</div>`;
+
     const scoreColor = badgeClass(lead.scoreLabel);
 
     row.innerHTML = `
-      <td>${i + 1}</td>
       <td style="font-size:1.1rem">${lead.brazilTab ? '🇧🇷' : '🇺🇸'}</td>
-      <td>${nameCell}</td>
+      <td style="white-space:normal; min-width:200px">${nameCell}</td>
       <td>${phoneCell}</td>
-      <td>${lead.website
-        ? `<a href="${esc(lead.website)}" target="_blank" rel="noopener">${shortenUrl(lead.website)}</a>`
-        : '<span class="na">—</span>'}</td>
-      <td>${igCell}</td>
       <td>${lead.rating != null ? `⭐ ${lead.rating}` : '<span class="na">—</span>'}</td>
       <td>${lead.reviewCount != null ? lead.reviewCount : '<span class="na">—</span>'}</td>
-      <td>
-        <span class="badge ${scoreColor}">${lead.scoreLabel}</span>
-        <span class="score-num">${lead.score}pts</span>
-      </td>
-      <td><span class="source-badge source-${(lead.source||'').toLowerCase()}">${esc(lead.source||'—')}</span></td>
-      <td>${lead.portugueseSite ? '<span class="pt-badge">🇧🇷 PT</span>' : '<span class="na">—</span>'}</td>
+      <td><span class="badge ${scoreColor}">${lead.scoreLabel}</span></td>
+      <td>${actionsCell}</td>
     `;
     resultsBody.appendChild(row);
   });
@@ -400,10 +397,41 @@ function autoResize(el) {
 /* ─── Utility: Badge class ─── */
 function badgeClass(label) {
   if (!label) return 'badge-cold';
-  if (label.includes('Hot'))    return 'badge-hot';
-  if (label.includes('Strong')) return 'badge-strong';
-  if (label.includes('Good'))   return 'badge-good';
+  if (label.includes('High'))  return 'badge-hot';    // 🔥 High Opportunity → orange
+  if (label.includes('Good'))  return 'badge-strong'; // ⭐ Good Lead → green
+  if (label.includes('Solid')) return 'badge-good';   // 👍 Solid Lead → cyan
   return 'badge-cold';
+}
+
+/* ─── Utility: Generate insight line for a lead ─── */
+function generateInsight(lead) {
+  if (!lead.website && !lead.instagram) return '🚀 No web presence — full opportunity';
+  if (lead.website && !lead.instagram)  return '📸 No Instagram — needs social media';
+  if (!lead.website && lead.instagram)  return '🌐 No website — digital presence gap';
+  if (lead.reviewCount != null && lead.reviewCount < 15) return '🌱 Growing business — open to marketing';
+  if (lead.rating != null && lead.rating >= 4.5 && lead.reviewCount >= 50) return '⭐ Top-rated — premium client potential';
+  if (lead.rating != null && lead.rating >= 4.0) return '✅ Established business — solid prospect';
+  return '📍 Local business — ready to reach out';
+}
+
+/* ─── Utility: Copy pitch from Quick Actions ─── */
+function copyPitch(name) {
+  const lead = leadsMap[name];
+  if (!lead || !lead.outreachMessage) return;
+  navigator.clipboard.writeText(lead.outreachMessage).then(() => {
+    // Find the pitch button and flash it
+    document.querySelectorAll('.action-pitch').forEach((btn) => {
+      if (btn.getAttribute('onclick') === `copyPitch('${name}')`) {
+        const orig = btn.textContent;
+        btn.textContent = '✅ Copiado!';
+        btn.classList.add('action-copied');
+        setTimeout(() => {
+          btn.textContent = orig;
+          btn.classList.remove('action-copied');
+        }, 1800);
+      }
+    });
+  });
 }
 
 function shortenUrl(url) {
