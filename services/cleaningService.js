@@ -79,6 +79,47 @@ function deduplicate(leads) {
 }
 
 /**
+ * Extract a 2-letter US state code from a city string.
+ * "Providence, RI" → "RI"   |   "Miami, FL" → "FL"   |   "Boston" → null
+ */
+function extractStateCode(cityInput) {
+  const m = String(cityInput || '').trim().match(/,\s*([A-Za-z]{2})\s*$/);
+  return m ? m[1].toUpperCase() : null;
+}
+
+/**
+ * Strict location filter — rejects leads whose address belongs to a different US state.
+ *
+ * Google Places addresses arrive as: "123 Main St, Providence, RI 02903, USA"
+ * The reliable signal is the pattern ", ST 12345" (state code immediately before ZIP).
+ *
+ * Rules:
+ *  1. No 2-letter state in search query → skip (can't filter without it).
+ *  2. Lead address contains a DIFFERENT state + ZIP → REJECT.
+ *  3. Lead address matches the searched state → KEEP.
+ *  4. Address missing or state+ZIP pattern absent → KEEP (benefit of the doubt).
+ */
+function filterByLocation(leads, searchedCity) {
+  const stateCode = extractStateCode(searchedCity);
+  if (!stateCode) return leads;
+
+  return leads.filter((lead) => {
+    const addr = (lead.address || '').toUpperCase().trim();
+    if (!addr) return true; // no address → keep
+
+    // Canonical US pattern: ", ST 12345"
+    const m = addr.match(/,\s+([A-Z]{2})\s+\d{5}/);
+    if (!m) return true; // state+ZIP not found → keep
+
+    if (m[1] !== stateCode) {
+      console.log(`[cleaningService] Removed out-of-state lead: "${lead.name}" (${m[1]} ≠ ${stateCode})`);
+      return false;
+    }
+    return true;
+  });
+}
+
+/**
  * Clean an array of raw leads.
  * Normalizes phone/website and removes duplicates.
  */
@@ -91,4 +132,4 @@ function cleanLeads(leads) {
   return deduplicate(normalized);
 }
 
-module.exports = { cleanLeads };
+module.exports = { cleanLeads, filterByLocation };

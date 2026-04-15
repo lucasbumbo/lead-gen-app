@@ -224,8 +224,10 @@ function renderResults(leads, niche, city, brazilTab) {
     const siteBtn = lead.website
       ? `<a class="action-btn action-site" href="${esc(lead.website)}" target="_blank" rel="noopener" title="${esc(lead.website)}">🌐 Site</a>`
       : `<span class="action-btn action-disabled" title="No website">🌐 Site</span>`;
-    const igSearchUrl = `https://www.instagram.com/explore/search/keyword/?q=${encodeURIComponent(lead.name)}`;
-    const igBtn   = `<a class="action-btn action-ig" href="${igSearchUrl}" target="_blank" rel="noopener" title="Search on Instagram">📸 IG</a>`;
+    // IG button: direct profile if we have the URL, otherwise a clearly-labelled search fallback
+    const igBtn = lead.instagram
+      ? `<a class="action-btn action-ig" href="${esc(lead.instagram)}" target="_blank" rel="noopener" title="Open Instagram Profile">📸 Profile</a>`
+      : `<a class="action-btn action-ig-search" href="https://www.instagram.com/explore/search/keyword/?q=${encodeURIComponent(lead.name)}" target="_blank" rel="noopener" title="Search Instagram">🔍 Search IG</a>`;
     const pitchBtn = `<button class="action-btn action-pitch" onclick="copyPitch('${nameEscaped}')" title="Copy pitch message">📋 Pitch</button>`;
     const actionsCell = `<div class="action-row">${siteBtn}${igBtn}${pitchBtn}</div>`;
 

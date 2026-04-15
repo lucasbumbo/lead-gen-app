@@ -6,7 +6,7 @@
 
 const { searchBusinesses }    = require('../services/placesService');
 const { searchFoursquare }    = require('../services/foursquareService');
-const { cleanLeads }          = require('../services/cleaningService');
+const { cleanLeads, filterByLocation } = require('../services/cleaningService');
 const { scoreLeads }          = require('../services/scoringService');
 const { addOutreachMessages } = require('../services/outreachService');
 const { exportToCSV, getExportPath } = require('../services/exportService');
@@ -81,8 +81,11 @@ async function getLeads(req, res) {
     // 2. Normalize phone/website, remove duplicates
     const cleaned = cleanLeads(raw);
 
+    // 2b. Remove leads outside the searched city/state (e.g. FL results for Providence, RI)
+    const located = filterByLocation(cleaned, cleanCity);
+
     // 3. Score and rank
-    const scored = scoreLeads(cleaned);
+    const scored = scoreLeads(located);
 
     // 4. Generate outreach messages (EN or PT-BR based on brazilTab)
     const leads = addOutreachMessages(scored);

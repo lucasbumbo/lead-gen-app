@@ -859,6 +859,19 @@ tr.contacted td { opacity: 0.4; }
   color: var(--green) !important;
 }
 
+/* Search IG fallback — muted style to distinguish from a verified direct profile link */
+.action-ig-search {
+  background: rgba(148,163,184,0.08);
+  color: var(--muted2);
+  border-color: rgba(148,163,184,0.2);
+}
+.action-ig-search:hover {
+  background: rgba(244,114,182,0.1);
+  color: var(--pink);
+  border-color: rgba(244,114,182,0.25);
+  text-decoration: none;
+}
+
 .action-disabled {
   background: rgba(100,116,139,0.1);
   color: var(--muted);
