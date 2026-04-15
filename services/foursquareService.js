@@ -53,7 +53,9 @@ async function searchFoursquare(niche, inputCity, options = {}) {
   if (!FSQ_API_KEY) return [];
 
   const { brazilTab = false } = options;
-  const query    = brazilTab ? `${niche} brasileiro` : niche;
+  // Avoid duplicating "brasileiro" if niche already contains it
+  const nicheHasBr = /brasileiro/i.test(niche);
+  const query      = brazilTab && !nicheHasBr ? `${niche} brasileiro` : niche;
   const params   = new URLSearchParams({
     query,
     near:   inputCity,

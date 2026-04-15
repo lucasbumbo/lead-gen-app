@@ -121,9 +121,10 @@ async function searchBusinesses(niche, city, options = {}) {
 
   const { brazilTab = false } = options;
 
-  // Build query
+  // Build query — avoid duplicating "brasileiro" if niche already contains it
+  const nicheHasBr = /brasileiro/i.test(niche);
   const query = brazilTab
-    ? `${niche} brasileiro in ${city}`
+    ? `${niche}${nicheHasBr ? '' : ' brasileiro'} in ${city}`
     : `${niche} in ${city}`;
 
   console.log(`[placesService] Searching: "${query}" (brazilTab=${brazilTab})`);
