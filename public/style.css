@@ -690,6 +690,49 @@ tr.contacted td { opacity: 0.4; }
   margin-top: 48px;
 }
 
+/* ── Notes textarea ── */
+.lead-note {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  margin-top: 5px;
+  padding: 4px 8px;
+  background: var(--surface2);
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--muted2);
+  font-size: 0.72rem;
+  font-family: inherit;
+  resize: none;
+  overflow: hidden;
+  min-height: 26px;
+  line-height: 1.5;
+  transition: border-color 0.2s, color 0.2s;
+}
+.lead-note:focus {
+  outline: none;
+  border-color: var(--cyan);
+  color: var(--text);
+}
+.lead-note::placeholder { color: var(--muted); }
+
+/* ── Re-run button (history) ── */
+.btn-rerun {
+  padding: 5px 12px;
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border: 1px solid rgba(34,211,238,0.3);
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-rerun:hover {
+  background: rgba(34,211,238,0.2);
+  box-shadow: 0 0 8px var(--cyan-glow);
+}
+
 /* ── Mobile responsive ── */
 @media (max-width: 768px) {
   .container { padding: 20px 14px 48px; }

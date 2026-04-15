@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────
-   VideoLead Finder — frontend logic
+   LenzLead — frontend logic
    ───────────────────────────────────────────────── */
 
 const statusEl     = document.getElementById('status');
@@ -26,6 +26,15 @@ let contactedSet = new Set(JSON.parse(localStorage.getItem('vl_contacted') || '[
 
 function saveContacted() {
   localStorage.setItem('vl_contacted', JSON.stringify([...contactedSet]));
+}
+
+/* ─── Notes per lead (persisted in localStorage) ─── */
+let notesMap = JSON.parse(localStorage.getItem('vl_notes') || '{}');
+
+function saveNote(name, text) {
+  if (text.trim()) notesMap[name] = text.trim();
+  else delete notesMap[name];
+  localStorage.setItem('vl_notes', JSON.stringify(notesMap));
 }
 
 /* ─── Market tab switching ─── */
@@ -57,8 +66,9 @@ document.getElementById('form-brazil').addEventListener('submit', async (e) => {
 });
 
 /* ─── Filter bar listeners ─── */
-document.getElementById('filter-pt').addEventListener('change',     () => applyFilters());
-document.getElementById('filter-source').addEventListener('change', () => applyFilters());
+document.getElementById('filter-pt').addEventListener('change',          () => applyFilters());
+document.getElementById('filter-source').addEventListener('change',      () => applyFilters());
+document.getElementById('filter-uncontacted').addEventListener('change', () => applyFilters());
 
 /* ─── Sort headers ─── */
 document.querySelectorAll('th[data-sort]').forEach((th) => {
@@ -124,12 +134,14 @@ async function runSearch(niche, city, brazilTab) {
 
 /* ─── Filter + Sort pipeline ─── */
 function applyFilters() {
-  const ptOnly    = document.getElementById('filter-pt').checked;
-  const srcFilter = document.getElementById('filter-source').value;
+  const ptOnly        = document.getElementById('filter-pt').checked;
+  const srcFilter     = document.getElementById('filter-source').value;
+  const uncontacted   = document.getElementById('filter-uncontacted').checked;
 
   let filtered = allLeads;
   if (ptOnly)              filtered = filtered.filter((l) => l.portugueseSite);
   if (srcFilter !== 'all') filtered = filtered.filter((l) => (l.source || '').toLowerCase() === srcFilter);
+  if (uncontacted)         filtered = filtered.filter((l) => !contactedSet.has(l.name));
 
   filtered = [...filtered].sort((a, b) => {
     const av = a[sortCol] ?? (typeof a[sortCol] === 'string' ? '' : -999);
@@ -191,17 +203,22 @@ function renderResults(leads, niche, city, brazilTab) {
       phoneCell = `<span class="phone-copy" onclick="copyText('${esc(lead.phone)}', this)" title="Click to copy">${esc(lead.phone)}</span>${waBtn}`;
     }
 
-    // Name cell — with address + contacted checkbox
+    // Name cell — with address + contacted checkbox + notes
     const addrLine = lead.address
       ? `<div class="lead-address">${esc(lead.address)}</div>`
       : '';
+    const savedNote = notesMap[lead.name] || '';
+    const nameEscaped = esc(lead.name).replace(/'/g, '&#39;');
     const nameCell = `
       <label class="contacted-wrap" title="${contactedSet.has(lead.name) ? 'Contactado' : 'Marcar como contactado'}">
         <input type="checkbox" class="contacted-cb" ${contactedSet.has(lead.name) ? 'checked' : ''}
-          onchange="toggleContacted('${esc(lead.name)}', this)">
+          onchange="toggleContacted('${nameEscaped}', this)">
         <strong>${esc(lead.name)}</strong>
       </label>
-      ${addrLine}`;
+      ${addrLine}
+      <textarea class="lead-note" placeholder="📝 Anotação…" rows="1"
+        onblur="saveNote('${nameEscaped}', this.value)"
+        oninput="autoResize(this)">${esc(savedNote)}</textarea>`;
 
     const scoreColor = badgeClass(lead.scoreLabel);
 
@@ -298,6 +315,7 @@ async function loadHistory() {
           <div class="meta">${date} · ${entry.totalLeads} leads</div>
         </div>
         <div class="history-actions">
+          <button class="btn-rerun" onclick="rerunSearch('${esc(entry.niche)}','${esc(entry.city)}',${!!entry.brazilTab})">↩ Repetir</button>
           ${entry.csvFile
             ? `<a href="/api/leads/export/${encodeURIComponent(entry.csvFile)}">⬇️ CSV</a>`
             : ''}
@@ -310,6 +328,12 @@ async function loadHistory() {
   }
 }
 
+/* ─── Re-run search from history ─── */
+async function rerunSearch(niche, city, brazilTab) {
+  switchResultTab('results');
+  await runSearch(niche, city, brazilTab);
+}
+
 /* ─── Utility: Contacted toggle ─── */
 function toggleContacted(name, checkbox) {
   if (checkbox.checked) contactedSet.add(name);
@@ -318,6 +342,8 @@ function toggleContacted(name, checkbox) {
   document.querySelectorAll(`tr[data-name="${name.replace(/"/g, '\\"')}"]`).forEach((row) => {
     row.classList.toggle('contacted', checkbox.checked);
   });
+  // If uncontacted filter is active, re-apply to hide newly contacted
+  if (document.getElementById('filter-uncontacted').checked) applyFilters();
 }
 
 /* ─── Utility: Copy text (phone) ─── */
@@ -363,6 +389,12 @@ function copyMessage(msgId, hintId) {
       hint.classList.remove('copied');
     }, 2000);
   });
+}
+
+/* ─── Utility: Auto-resize textarea ─── */
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
 }
 
 /* ─── Utility: Badge class ─── */

@@ -50,6 +50,7 @@ function leadsToCSV(leads) {
     'Score',
     'Score Label',
     'Outreach Message',
+    'WhatsApp Message',
     'Source',
     'PT Site',
   ];
@@ -67,6 +68,7 @@ function leadsToCSV(leads) {
     lead.score,
     lead.scoreLabel,
     lead.outreachMessage,
+    lead.whatsappMessage,
     lead.source,
     lead.portugueseSite ? 'Yes' : 'No',
   ]);
