@@ -66,6 +66,11 @@ document.getElementById('form-brazil').addEventListener('submit', async (e) => {
   if (niche && city) await runSearch(niche, city, true);
 });
 
+/* ─── ESC closes the Lead Detail drawer ─── */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && _drawerLead) closeLeadDetail();
+});
+
 /* ─── Filter bar listeners ─── */
 document.getElementById('filter-pt').addEventListener('change',          () => applyFilters());
 document.getElementById('filter-source').addEventListener('change',      () => applyFilters());
@@ -476,16 +481,32 @@ function openLeadDetail(name) {
   document.getElementById('drawer-badge').innerHTML     =
     `<span class="badge ${badgeClass(lead.scoreLabel)}">${lead.scoreLabel}</span>`;
 
-  // Info grid
+  // Actions bar — Contacted toggle + WhatsApp
+  const waNum       = lead.phone ? formatWAPhone(lead.phone) : null;
+  const isContacted = contactedSet.has(lead.name);
+  const waBarBtn    = waNum
+    ? `<a class="drawer-bar-btn drawer-bar-wa" href="https://wa.me/${waNum}" target="_blank" rel="noopener">💬 WhatsApp</a>`
+    : '';
+  document.getElementById('drawer-actions-bar').innerHTML = `
+    <button class="drawer-bar-btn drawer-contacted-btn ${isContacted ? 'is-contacted' : ''}"
+            onclick="drawerToggleContacted()">
+      ${isContacted ? '✅ Contactado' : '◯ Marcar Contactado'}
+    </button>
+    ${waBarBtn}`;
+
+  // Info grid — phone row includes WA link inline
+  const phoneVal = lead.phone
+    ? `${esc(lead.phone)}${waNum ? ` <a class="drawer-wa-inline" href="https://wa.me/${waNum}" target="_blank" rel="noopener">💬</a>` : ''}`
+    : null;
   const rows = [
-    ['CIDADE',    lead.city],
-    ['TELEFONE',  lead.phone   || null],
+    ['CIDADE',    esc(lead.city)],
+    ['TELEFONE',  phoneVal],
     ['WEBSITE',   lead.website ? `<a href="${esc(lead.website)}" target="_blank" rel="noopener">🌐 ${esc(shortenUrl(lead.website))}</a>` : null],
     ['INSTAGRAM', lead.instagram ? `<a href="${esc(lead.instagram)}" target="_blank" rel="noopener" class="ig-link">📸 ${esc(lead.instagram.replace('https://instagram.com/','@'))}</a>` : null],
-    ['AVALIAÇÃO', lead.rating != null ? `⭐ ${lead.rating}` : null],
+    ['AVALIAÇÃO', lead.rating     != null ? `⭐ ${lead.rating}` : null],
     ['REVIEWS',   lead.reviewCount != null ? `${lead.reviewCount} reviews` : null],
-    ['ENDEREÇO',  lead.address || null],
-    ['FONTE',     lead.source  || null],
+    ['ENDEREÇO',  lead.address ? esc(lead.address) : null],
+    ['FONTE',     lead.source  ? esc(lead.source)  : null],
   ].filter(([, v]) => v != null);
 
   document.getElementById('drawer-info-grid').innerHTML = rows.map(([label, val]) => `
@@ -745,6 +766,17 @@ function crmCopyPitch(name) {
     btn.textContent = '✅ Copiado!';
     setTimeout(() => { btn.textContent = orig; }, 1800);
   });
+}
+
+function drawerToggleContacted() {
+  if (!_drawerLead) return;
+  const name    = _drawerLead.name;
+  const newVal  = !contactedSet.has(name);
+  toggleContacted(name, { checked: newVal }); // reuses existing logic + saves to localStorage
+  const btn = document.querySelector('.drawer-contacted-btn');
+  if (!btn) return;
+  btn.textContent = newVal ? '✅ Contactado' : '◯ Marcar Contactado';
+  btn.classList.toggle('is-contacted', newVal);
 }
 
 /* ═══════════════════════════════════════════════════

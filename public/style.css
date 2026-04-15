@@ -919,6 +919,75 @@ body.drawer-open { overflow: hidden; }
 }
 .lead-drawer.open { transform: translateX(0); }
 
+/* Drawer actions bar */
+.drawer-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.drawer-bar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted2);
+}
+.drawer-bar-btn:hover {
+  color: var(--text);
+  border-color: var(--muted);
+  background: #1f2d42;
+}
+
+.drawer-contacted-btn {
+  color: var(--muted2);
+}
+.drawer-contacted-btn.is-contacted {
+  color: var(--green);
+  border-color: rgba(74,222,128,0.35);
+  background: var(--green-dim);
+}
+.drawer-contacted-btn.is-contacted:hover {
+  background: rgba(74,222,128,0.2);
+}
+
+.drawer-bar-wa {
+  color: #4ade80;
+  border-color: rgba(74,222,128,0.3);
+  background: rgba(74,222,128,0.06);
+}
+.drawer-bar-wa:hover {
+  background: rgba(74,222,128,0.15);
+  border-color: rgba(74,222,128,0.55);
+  color: #86efac;
+}
+
+/* Inline WA link inside info grid */
+.drawer-wa-inline {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  font-size: 1rem;
+  margin-left: 6px;
+  opacity: 0.75;
+  transition: opacity 0.15s;
+  vertical-align: middle;
+}
+.drawer-wa-inline:hover { opacity: 1; }
+
 /* Drawer header */
 .drawer-header {
   display: flex;
