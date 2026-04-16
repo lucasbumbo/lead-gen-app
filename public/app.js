@@ -6,6 +6,7 @@ const statusEl     = document.getElementById('status');
 const tabsWrapper  = document.getElementById('tabs-wrapper');
 const resultsTitle = document.getElementById('results-title');
 const resultsBody  = document.getElementById('results-body');
+const mobileCards  = document.getElementById('mobile-cards');
 const exportBtn    = document.getElementById('export-btn');
 const outreachList = document.getElementById('outreach-list');
 const historyList  = document.getElementById('history-list');
@@ -93,6 +94,7 @@ async function runSearch(niche, city, brazilTab) {
   disableSearchBtns(true);
   tabsWrapper.classList.add('hidden');
   resultsBody.innerHTML  = '';
+  mobileCards.innerHTML  = '';
   outreachList.innerHTML = '';
   currentCsvFile = null;
   allLeads = [];
@@ -161,6 +163,7 @@ function applyFilters() {
   });
 
   renderResults(filtered, currentNiche, currentCity, currentBrazil);
+  renderMobileCards(filtered);
   renderOutreach(filtered);
 }
 
@@ -248,6 +251,44 @@ function renderResults(leads, niche, city, brazilTab) {
       <td>${actionsCell}</td>
     `;
     resultsBody.appendChild(row);
+  });
+}
+
+/* ─── Render: Mobile Cards ─── */
+function renderMobileCards(leads) {
+  mobileCards.innerHTML = '';
+  leads.forEach((lead) => {
+    const nameEscaped = esc(lead.name).replace(/'/g, '&#39;');
+    const scoreColor  = badgeClass(lead.scoreLabel);
+
+    const waNum  = lead.phone ? formatWAPhone(lead.phone) : null;
+    const waLink = waNum ? `<a class="action-btn action-site" href="https://wa.me/${waNum}" target="_blank" rel="noopener" style="color:#4ade80;border-color:rgba(74,222,128,0.3)">💬 WhatsApp</a>` : '';
+
+    const siteBtn = lead.website
+      ? `<a class="action-btn action-site" href="${esc(lead.website)}" target="_blank" rel="noopener">🌐 Site</a>`
+      : `<span class="action-btn action-disabled">🌐 Site</span>`;
+    const igBtn = lead.instagram
+      ? `<a class="action-btn action-ig" href="${esc(lead.instagram)}" target="_blank" rel="noopener">📸 IG</a>`
+      : `<a class="action-btn action-ig-search" href="https://www.instagram.com/explore/search/keyword/?q=${encodeURIComponent(lead.name)}" target="_blank" rel="noopener">🔍 IG</a>`;
+    const pitchBtn = `<button class="action-btn action-pitch" onclick="copyPitch('${nameEscaped}')">📋 Pitch</button>`;
+
+    const metaParts = [];
+    if (lead.rating   != null) metaParts.push(`⭐ ${lead.rating}`);
+    if (lead.reviewCount != null) metaParts.push(`${lead.reviewCount} reviews`);
+    if (lead.phone)              metaParts.push(`📞 ${esc(lead.phone)}`);
+
+    const card = document.createElement('div');
+    card.className = 'm-card';
+    card.innerHTML = `
+      <div class="m-card-top">
+        <span class="m-card-name" onclick="openLeadDetail('${nameEscaped}')">${esc(lead.name)}</span>
+        <span class="badge ${scoreColor}">${lead.scoreLabel}</span>
+      </div>
+      <div class="m-card-insight">${generateInsight(lead)}</div>
+      <div class="m-card-meta">${metaParts.join(' · ')}</div>
+      <div class="m-card-actions">${siteBtn}${igBtn}${pitchBtn}${waLink}</div>
+    `;
+    mobileCards.appendChild(card);
   });
 }
 
@@ -798,10 +839,24 @@ function esc(str) {
 }
 
 function setStatus(msg, isError = false, isLoading = false) {
-  statusEl.textContent = msg;
-  statusEl.className   = isError ? 'error' : isLoading ? 'loading' : '';
+  if (isLoading) {
+    statusEl.innerHTML = `${msg}<span class="dot-pulse"><span></span><span></span><span></span></span>`;
+  } else {
+    statusEl.textContent = msg;
+  }
+  statusEl.className = isError ? 'error' : isLoading ? 'loading' : '';
 }
 
 function disableSearchBtns(state) {
-  document.querySelectorAll('.btn-search').forEach((b) => (b.disabled = state));
+  document.querySelectorAll('.btn-search').forEach((b) => {
+    b.disabled = state;
+    if (state) {
+      b._originalHTML = b.innerHTML;
+      b.innerHTML = '🔍 Finding<span class="dot-pulse"><span></span><span></span><span></span></span>';
+      b.classList.add('loading-state');
+    } else {
+      if (b._originalHTML) b.innerHTML = b._originalHTML;
+      b.classList.remove('loading-state');
+    }
+  });
 }
