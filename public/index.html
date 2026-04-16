@@ -21,10 +21,17 @@
     <!-- ── Hero ── -->
     <div class="hero">
       <h1 class="hero-title">
-        <span class="hero-line">Find Local Clients.</span>
-        <span class="hero-line accent">Reach Out Today.</span>
+        <span class="hero-line">20 Warm Leads.</span>
+        <span class="hero-line accent">Under 60 Seconds.</span>
       </h1>
-      <p class="hero-sub">Search by niche &amp; city. Get scored leads. Send your pitch.</p>
+      <p class="hero-sub">Type a niche and city — LenzLead finds local businesses, scores their opportunity, and writes your outreach. Ready to send.</p>
+      <div class="hero-trust">
+        <span>🌎 Works in 100+ US cities</span>
+        <span class="trust-dot">·</span>
+        <span>📊 Powered by Google Places</span>
+        <span class="trust-dot">·</span>
+        <span>🎥 Built for videographers</span>
+      </div>
     </div>
 
     <!-- ── 3-step strip ── -->
@@ -136,6 +143,11 @@
 
       <!-- Results -->
       <div id="tab-results" class="tab-content active">
+        <!-- Demo banner — shown only when displaying sample data -->
+        <div id="demo-banner" class="demo-banner" style="display:none">
+          <span>👁 Preview — dados de exemplo. Faça uma busca para ver leads reais.</span>
+          <button onclick="document.getElementById('demo-banner').style.display='none'; document.getElementById('tabs-wrapper').classList.add('hidden')">✕</button>
+        </div>
         <div class="tab-header">
           <span id="results-title"></span>
           <button id="export-btn">⬇️ Export CSV</button>
@@ -164,7 +176,7 @@
                 <th>Phone</th>
                 <th data-sort="rating" class="sortable">Rating ↕</th>
                 <th data-sort="reviewCount" class="sortable">Reviews ↕</th>
-                <th data-sort="score" class="sortable">Score ↕</th>
+                <th data-sort="score" class="sortable" title="Score baseado em presença digital, avaliações e potencial de resposta">Score ↕ <span class="th-hint">ⓘ</span></th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -264,7 +276,9 @@
   </div>
 
   <footer class="site-footer">
-    <span>LenzLead · by Lucas Lenzi</span>
+    <span>LenzLead v1.0 · Built for videographers · by <strong>Lucas Lenzi</strong></span>
+    <span class="footer-sep">·</span>
+    <span class="footer-powered">Powered by Google Places &amp; Foursquare</span>
   </footer>
 
   <script src="app.js"></script>

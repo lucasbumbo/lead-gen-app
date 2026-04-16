@@ -39,6 +39,38 @@ function saveNote(name, text) {
   localStorage.setItem('vl_notes', JSON.stringify(notesMap));
 }
 
+/* ─── Demo leads preview (shown on first load) ─── */
+const DEMO_LEADS = [
+  { name: 'Brickell Barbershop',      city: 'Miami, FL',       niche: 'barbershop',  phone: '(305) 555-0182', website: 'https://brickellbarbershop.com', instagram: null,       rating: 4.2, reviewCount: 38,  scoreValue: 85, scoreLabel: '🔥 High Opportunity', address: '801 Brickell Ave, Miami, FL', source: 'Google',     brazilTab: false },
+  { name: 'South Beach Yoga Studio',  city: 'Miami, FL',       niche: 'yoga studio', phone: null,              website: 'https://sbeyoga.com',            instagram: null,       rating: 4.7, reviewCount: 112, scoreValue: 72, scoreLabel: '⭐ Good Lead',        address: '1234 Ocean Dr, Miami Beach, FL', source: 'Google',  brazilTab: false },
+  { name: 'Midtown Fitness Club',     city: 'Miami, FL',       niche: 'gym',         phone: '(305) 555-0341', website: null,                            instagram: null,       rating: 3.9, reviewCount: 21,  scoreValue: 61, scoreLabel: '⭐ Good Lead',        address: '3400 NW 2nd Ave, Miami, FL',    source: 'Google',  brazilTab: false },
+  { name: "Marco's Pizzeria",         city: 'Miami, FL',       niche: 'restaurant',  phone: '(305) 555-0099', website: 'https://marcospizzeria.com',     instagram: null,       rating: 4.5, reviewCount: 204, scoreValue: 78, scoreLabel: '⭐ Good Lead',        address: '200 SE 1st St, Miami, FL',      source: 'Google',  brazilTab: false },
+  { name: 'Coral Gables Pet Salon',   city: 'Miami, FL',       niche: 'pet salon',   phone: '(305) 555-0774', website: null,                            instagram: null,       rating: 4.8, reviewCount: 9,   scoreValue: 55, scoreLabel: '👍 Solid Lead',       address: '2525 Ponce De Leon Blvd, FL',   source: 'Google',  brazilTab: false },
+  { name: 'Downtown Dental Care',     city: 'Miami, FL',       niche: 'dentist',     phone: '(786) 555-0213', website: 'https://downtowndental.com',     instagram: null,       rating: 3.6, reviewCount: 44,  scoreValue: 80, scoreLabel: '🔥 High Opportunity', address: '100 SE 2nd Ave Ste 400, FL',    source: 'Google',  brazilTab: false },
+  { name: 'Wynwood Coffee Roasters',  city: 'Miami, FL',       niche: 'coffee shop', phone: null,              website: null,                            instagram: null,       rating: 4.1, reviewCount: 17,  scoreValue: 90, scoreLabel: '🔥 High Opportunity', address: '2750 NW 3rd Ave, Miami, FL',    source: 'Foursquare', brazilTab: false },
+  { name: 'Little Havana Auto Detailing', city: 'Miami, FL',  niche: 'auto',        phone: '(305) 555-0465', website: null,                            instagram: null,       rating: null, reviewCount: null, scoreValue: 30, scoreLabel: '❄️ Cold Lead',       address: '1540 SW 8th St, Miami, FL',     source: 'Google',  brazilTab: false },
+];
+
+function loadDemoLeads() {
+  // Score + sort like the real pipeline
+  const scored = DEMO_LEADS.map(l => ({ ...l, score: String(l.scoreValue) }))
+    .sort((a, b) => b.scoreValue - a.scoreValue);
+
+  allLeads = scored;
+  scored.forEach(l => { leadsMap[l.name] = l; });
+
+  resultsTitle.innerHTML = `🇺🇸 <strong>${scored.length} leads</strong> de exemplo — <strong>barbershop</strong> em <strong>Miami, FL</strong>`;
+  renderResults(scored, 'barbershop', 'Miami, FL', false);
+  renderMobileCards(scored);
+
+  document.getElementById('demo-banner').style.display = 'flex';
+  tabsWrapper.classList.remove('hidden');
+  currentCsvFile = null;
+}
+
+// Load demo on page ready
+window.addEventListener('DOMContentLoaded', loadDemoLeads);
+
 /* ─── Market tab switching ─── */
 document.querySelectorAll('.market-tab').forEach((btn) => {
   btn.addEventListener('click', () => {
