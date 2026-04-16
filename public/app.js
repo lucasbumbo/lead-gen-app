@@ -426,9 +426,9 @@ function autoResize(el) {
 /* ─── Utility: Badge class ─── */
 function badgeClass(label) {
   if (!label) return 'badge-cold';
-  if (label.includes('High'))  return 'badge-hot';    // 🔥 High Opportunity → orange
-  if (label.includes('Good'))  return 'badge-strong'; // ⭐ Good Lead → green
-  if (label.includes('Solid')) return 'badge-good';   // 👍 Solid Lead → cyan
+  if (label.includes('High'))  return 'badge-hot';    // 🔥 High Opportunity → red
+  if (label.includes('Good'))  return 'badge-good';   // ⭐ Good Lead → yellow
+  if (label.includes('Solid')) return 'badge-strong'; // 👍 Solid Lead → green
   return 'badge-cold';
 }
 
