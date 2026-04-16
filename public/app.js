@@ -190,7 +190,7 @@ function switchResultTab(name) {
 /* ─── Render: Results Table ─── */
 function renderResults(leads, niche, city, brazilTab) {
   const flag = brazilTab ? '🇧🇷' : '🇺🇸';
-  resultsTitle.textContent = `${flag} ${leads.length} leads — "${niche}" in ${city}`;
+  resultsTitle.innerHTML = `${flag} <strong>${leads.length} leads</strong> encontrados para <strong>${esc(niche)}</strong> em <strong>${esc(city)}</strong>`;
   resultsBody.innerHTML = '';
   leadsMap = {};
 
